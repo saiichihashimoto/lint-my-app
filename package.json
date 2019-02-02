@@ -10,27 +10,11 @@
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
   "bin": "bin.sh",
+  "main": "lint-staged.config.js",
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged --config lint-my-app"
     }
-  },
-  "lint-staged": {
-    "*.js": [
-      "echo",
-      "eslint --report-unused-disable-directives --fix",
-      "git add"
-    ],
-    "package.json": [
-      "echo",
-      "sort-package-json",
-      "git add"
-    ],
-    "{*.css,*.scss}": [
-      "echo",
-      "stylelint --fix",
-      "git add"
-    ]
   },
   "config": {
     "commitizen": {
