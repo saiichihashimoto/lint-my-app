@@ -9,6 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
+  "bin": "bin.sh",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
