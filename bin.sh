@@ -1,2 +1,0 @@
-pwd
-lint-staged
