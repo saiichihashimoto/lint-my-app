@@ -4,7 +4,7 @@ module.exports = {
 		'git add',
 	],
 	'*.js': [
-		'eslint --report-unused-disable-directives --fix',
+		'eslint --ignore-pattern \'!.*.js\' --report-unused-disable-directives --fix',
 		'git add',
 	],
 	'{*.css,*.scss}': [
