@@ -16,7 +16,6 @@
     "lint-staged-my-app": "lint-staged-my-app.sh"
   },
   "scripts": {
-    "fix": "sh ./fix-my-app.sh",
     "test": "run-s test:*",
     "test:fix": "sh ./fix-my-app.sh",
     "test:lint": "sh ./lint-my-app.sh"
