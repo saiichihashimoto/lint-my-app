@@ -10,15 +10,13 @@
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
   "main": "lint-staged.config.js",
-  "bin": {
-    "fix-my-app": "fix-my-app.sh",
-    "lint-my-app": "lint-my-app.sh",
-    "lint-staged-my-app": "lint-staged-my-app.sh"
+  "directories": {
+    "bin": "./bin"
   },
   "scripts": {
     "test": "run-s test:*",
-    "test:fix": "sh ./fix-my-app.sh",
-    "test:lint": "sh ./lint-my-app.sh"
+    "test:fix": "sh ./bin/fix-my-app.sh",
+    "test:lint": "sh ./bin/lint-my-app.sh"
   },
   "husky": {
     "hooks": {
@@ -27,7 +25,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "cz-conventional-changelog"
     }
   },
   "eslintConfig": {
