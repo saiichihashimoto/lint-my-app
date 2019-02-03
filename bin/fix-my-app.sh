@@ -1,9 +1,12 @@
 sort-package-json
 
-eslint --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives --fix .
+eslint --fix --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives .
 
-stylelint --ignore-path .gitignore --fix "**/*.css" "**/*.scss"
-stylelint --ignore-path .gitignore --report-needless-disables --fix "**/*.css" "**/*.scss"
+stylelint --fix --ignore-path .gitignore "**/*.css"
+stylelint --fix --ignore-path .gitignore --report-needless-disables "**/*.css"
+
+stylelint --fix --syntax=scss --ignore-path .gitignore "**/*.scss"
+stylelint --fix --syntax=scss --ignore-path .gitignore --report-needless-disables "**/*.scss"
 
 git ls-files | grep "\.json$" | grep -v package | xargs -I{} fixjson --write "$(pwd)/{}"
 
