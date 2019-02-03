@@ -1,6 +1,6 @@
 sort-package-json
 
-eslint --fix --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives .
+eslint --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives --fix .
 
-stylelint --fix --ignore-path .gitignore .
-stylelint --fix --ignore-path .gitignore . --report-needless-disables
+stylelint --ignore-path .gitignore --fix "**/*.css" "**/*.scss"
+stylelint --ignore-path .gitignore --report-needless-disables --fix "**/*.css" "**/*.scss"
