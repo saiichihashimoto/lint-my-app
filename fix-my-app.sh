@@ -5,4 +5,4 @@ eslint --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disabl
 stylelint --ignore-path .gitignore --fix "**/*.css" "**/*.scss"
 stylelint --ignore-path .gitignore --report-needless-disables --fix "**/*.css" "**/*.scss"
 
-git ls-files | grep "\(\.json$\)" | grep -v package | xargs -n 1 fixjson --write
+git ls-files | grep "\.json$" | grep -v package | xargs -I{} fixjson --write "$(pwd)/{}"
