@@ -11,4 +11,8 @@ module.exports = {
 		'stylelint --fix',
 		'git add',
 	],
+	'!(package|package-lock).json': [
+		'fixjson --write',
+		'git add',
+	],
 };
