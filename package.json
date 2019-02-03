@@ -11,6 +11,7 @@
   },
   "main": "lint-staged.config.js",
   "bin": {
+    "fix-my-app": "fix-my-app.sh",
     "lint-my-app": "lint-my-app.sh",
     "lint-staged-my-app": "lint-staged-my-app.sh"
   },
