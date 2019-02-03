@@ -15,8 +15,8 @@
   },
   "scripts": {
     "test": "run-s test:*",
-    "test:fix": "sh ./bin/fix-my-app.sh",
-    "test:lint": "sh ./bin/lint-my-app.sh"
+    "test:fix": "sh ./bin/fix-my-app",
+    "test:lint": "sh ./bin/lint-my-app"
   },
   "husky": {
     "hooks": {
