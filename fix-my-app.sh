@@ -6,3 +6,5 @@ stylelint --ignore-path .gitignore --fix "**/*.css" "**/*.scss"
 stylelint --ignore-path .gitignore --report-needless-disables --fix "**/*.css" "**/*.scss"
 
 git ls-files | grep "\.json$" | grep -v package | xargs -I{} fixjson --write "$(pwd)/{}"
+
+git ls-files | grep "\.\(png\|jpeg\|jpg\|gif\|svg\)$" | xargs -I{} imagemin-lint-staged "$(pwd)/{}"
