@@ -15,4 +15,8 @@ module.exports = {
 		'fixjson --write',
 		'git add',
 	],
+	'*.{png,jpeg,jpg,gif,svg}': [
+		'imagemin-lint-staged',
+		'git add',
+	],
 };
