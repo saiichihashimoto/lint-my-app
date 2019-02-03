@@ -10,13 +10,11 @@
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
   "main": "lint-staged.config.js",
-  "directories": {
-    "bin": "./bin"
-  },
+  "bin": "bin/lint-my-app",
   "scripts": {
     "test": "run-s test:*",
-    "test:fix": "sh ./bin/fix-my-app",
-    "test:lint": "sh ./bin/lint-my-app"
+    "test:fix": "sh ./bin/fix",
+    "test:lint": "sh ./bin/lint"
   },
   "husky": {
     "hooks": {
