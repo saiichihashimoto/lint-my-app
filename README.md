@@ -16,11 +16,11 @@ echo "module.exports = require('lint-my-app/husky');" >> .huskyrc.js
 # Commands
 All commands use your `.gitignore` and your lint configs (ie `.eslintconfigrc`, `.stylelintrc`, etc) for the lint commands.
 
-## lint-my-app
-This lints your entire app. If using `lint-my-app/husky`, this runs on `pre-push`.
+## lint-my-app lint
+This lints your entire app. If using `lint-my-app/husky`, this runs on `pre-push`. Running `lint-my-app` with no arguments defaults to this.
 
-## lint-staged-my-app
+## lint-my-app staged
 This fixes your git staged files. If using `lint-my-app/husky`, this runs on `pre-commit`.
 
-## fix-my-app
+## lint-my-app fix
 This fixes your entire app.
