@@ -1,6 +1,7 @@
 {
   "name": "lint-my-app",
   "version": "0.0.0-development",
+  "description": "So you can write your app instead of lint it!",
   "homepage": "https://saiichihashimoto.github.io/lint-my-app/",
   "bugs": {
     "url": "https://github.com/saiichihashimoto/lint-my-app/issues"

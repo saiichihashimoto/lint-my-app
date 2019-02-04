@@ -4,23 +4,37 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Greenkeeper badge](https://badges.greenkeeper.io/saiichihashimoto/lint-my-app.svg)](https://greenkeeper.io/)
 
-# Getting Started
-```bash
-npm install --save-dev lint-my-app
+[lint-staged](https://github.com/okonet/lint-staged) keeps the :poop: out of your app. I got tired of configuring [husky](https://github.com/typicode/husky) and lint-staged to get started. lint-my-app sets sane linting defaults so you can write your app instead of lint it!
 
-# husky is a great way to setup git hooks: https://www.npmjs.com/package/husky
-npm install --save-dev husky
-echo "module.exports = require('lint-my-app/husky');" >> .huskyrc.js
+# Install
+```sh
+npm install --save-dev lint-my-app husky
 ```
 
+```js
+// .huskyrc.js
+module.exports = require('lint-my-app/husky');
+```
+
+```sh
+git commit -m 'Keep calm and lint'
+```
+
+# Features
+- Fixes files using lint-staged on commit.
+- Lints your entire codebase on push.
+- All batteries included ([except husky configuration](https://github.com/typicode/husky/issues/245)).
+- Uses your personal eslint and stylelint configs
+- Respects `.gitignore`
+
 # Commands
-All commands use your `.gitignore` and your lint configs (ie `.eslintconfigrc`, `.stylelintrc`, etc) for the lint commands.
+For the most part, `lint-my-app/husky` can be given to husky and you're done! But the internal commands are open to you!
 
 ## lint-my-app lint
-This lints your entire app. If using `lint-my-app/husky`, this runs on `pre-push`. Running `lint-my-app` with no arguments defaults to this.
-
-## lint-my-app staged
-This fixes your git staged files. If using `lint-my-app/husky`, this runs on `pre-commit`.
+This lints your entire app.
 
 ## lint-my-app fix
 This fixes your entire app.
+
+## lint-my-app staged
+This fixes your git staged files.

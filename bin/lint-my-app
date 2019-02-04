@@ -1,17 +1,19 @@
+$root=$(npm explore lint-my-app -- pwd)
+
 if [ -z "$1" ]
 then
-	sh $(npm explore lint-my-app -- pwd)/bin/lint
+	sh $root/bin/lint
 	exit $?
 elif [ "$1" == "fix" ]
 then
-	sh $(npm explore lint-my-app -- pwd)/bin/fix
+	sh $root/bin/fix
 	exit $?
 elif [ "$1" == "lint" ]
 then
-	sh $(npm explore lint-my-app -- pwd)/bin/lint
+	sh $root/bin/lint
 	exit $?
 elif [ "$1" == "staged" ]
 then
-	sh $(npm explore lint-my-app -- pwd)/bin/staged
+	sh $root/bin/staged
 	exit $?
 fi
