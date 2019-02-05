@@ -1,4 +1,4 @@
-$root=$(npm explore lint-my-app -- pwd)
+root=$(npm explore lint-my-app -- pwd)
 
 if [ -z "$1" ]
 then
