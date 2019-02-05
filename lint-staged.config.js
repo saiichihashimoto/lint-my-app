@@ -1,4 +1,4 @@
-const useConfig = (process.cwd() === __dirname) && '';
+const useConfig = (process.cwd() === __dirname) && ' ';
 
 module.exports = {
 	'package.json': [
@@ -6,15 +6,15 @@ module.exports = {
 		'git add',
 	],
 	'*.js': [
-		`eslint --fix --ignore-pattern '!.*.js' --report-unused-disable-directives ${useConfig && '$(npm explore lint-my-app -- node ./addconfig.js eslint)'}`,
+		`eslint --fix --ignore-pattern '!.*.js' --report-unused-disable-directives ${useConfig || '$(node $(npm explore lint-my-app -- pwd)/addconfig.js eslint)'}`,
 		'git add',
 	],
 	'*.css': [
-		`stylelint --fix ${useConfig && '$(npm explore lint-my-app -- node ./addconfig.js stylelint)'}`,
+		`stylelint --fix ${useConfig || '$(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint)'}`,
 		'git add',
 	],
 	'*.scss': [
-		`stylelint --fix --syntax=scss ${useConfig && '$(npm explore lint-my-app -- node ./addconfig.js stylelint)'}`,
+		`stylelint --fix --syntax=scss ${useConfig || '$(npm explore lint-my-app -- node ./addconfig.js stylelint)'}`,
 		'git add',
 	],
 	'!(package|package-lock).json': [
