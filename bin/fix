@@ -1,3 +1,4 @@
+code=0
 root=$(npm explore lint-my-app -- pwd)
 if [ -z "$root" ]
 then
@@ -5,15 +6,25 @@ then
 fi
 
 sort-package-json
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
 eslint --fix --ignore-path .gitignore --color --ignore-pattern '!.*.js' --report-unused-disable-directives $(node $root/addConfig eslint) .
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
 stylelint --fix --ignore-path .gitignore --color $(node $root/addConfig stylelint) "**/*.css"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 stylelint --fix --ignore-path .gitignore --color $(node $root/addConfig stylelint) --report-needless-disables "**/*.css"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
 stylelint --syntax=scss --fix --ignore-path .gitignore $(node $root/addConfig stylelint) "**/*.scss"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 stylelint --syntax=scss --fix --ignore-path .gitignore $(node $root/addConfig stylelint) --report-needless-disables "**/*.scss"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
 git ls-files | grep "\.json$" | grep -v package | xargs -I{} fixjson --write "$(pwd)/{}"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
 git ls-files | grep "\.\(png\|jpeg\|jpg\|gif\|svg\)$" | xargs -I{} imagemin-lint-staged "$(pwd)/{}"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
+
+exit $code

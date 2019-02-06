@@ -1,25 +1,11 @@
 const cosmiconfig = require('cosmiconfig');
 
+const cosmiconfigOptions = {
+	eslint: { packageProp: 'eslintConfig' },
+};
+
 function cosmiconfigExists(moduleName) {
-	switch (moduleName) {
-		case 'eslint':
-			return (
-				cosmiconfig('eslint', {
-					searchPlaces: [
-						'.eslintrc.js',
-						'.eslintrc.yaml',
-						'.eslintrc.yml',
-						'.eslintrc.json',
-						'.eslintrc',
-					],
-				}).searchSync() ||
-				cosmiconfig('eslintConfig', {
-					searchPlaces: ['package.json'],
-				}).searchSync()
-			);
-		default:
-			return cosmiconfig(process.argv[2]).searchSync();
-	}
+	return Boolean(cosmiconfig(moduleName, cosmiconfigOptions[moduleName]).searchSync());
 }
 
 if (require.main === module) {
@@ -27,5 +13,9 @@ if (require.main === module) {
 		console.log(`--config ${__dirname}/empty.json`); // eslint-disable-line no-console
 	}
 } else {
-	module.exports = cosmiconfigExists;
+	module.exports = function addConfig(moduleName) {
+		return !cosmiconfigExists(moduleName) ?
+			`--config ${__dirname}/empty.json` :
+			'';
+	};
 }

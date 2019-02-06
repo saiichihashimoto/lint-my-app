@@ -1,8 +1,6 @@
 const addConfig = require('./addConfig');
 
-const eslintConfig = (process.cwd() !== __dirname) ? addConfig('eslint') : '';
-
-const stylelintConfig = (process.cwd() !== __dirname) ? addConfig('stylelint') : '';
+const stylelintConfig = addConfig('stylelint');
 
 module.exports = {
 	'package.json': [
@@ -10,7 +8,7 @@ module.exports = {
 		'git add',
 	],
 	'*.js': [
-		`eslint --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${eslintConfig}`,
+		`eslint --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${addConfig('eslint')}`,
 		'git add',
 	],
 	'*.css': [
