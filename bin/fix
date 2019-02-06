@@ -1,12 +1,18 @@
+root=$(npm explore lint-my-app -- pwd)
+if [ -z "$root" ]
+then
+	root=.
+fi
+
 sort-package-json
 
-eslint --fix --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives $(node $(npm explore lint-my-app -- pwd)/addconfig.js eslint) .
+eslint --fix --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives $(node $root/addConfig eslint) .
 
-stylelint --fix --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) "**/*.css"
-stylelint --fix --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) --report-needless-disables "**/*.css"
+stylelint --fix --ignore-path .gitignore $(node $root/addConfig stylelint) "**/*.css"
+stylelint --fix --ignore-path .gitignore $(node $root/addConfig stylelint) --report-needless-disables "**/*.css"
 
-stylelint --fix --syntax=scss --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) "**/*.scss"
-stylelint --fix --syntax=scss --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) --report-needless-disables "**/*.scss"
+stylelint --fix --syntax=scss --ignore-path .gitignore $(node $root/addConfig stylelint) "**/*.scss"
+stylelint --fix --syntax=scss --ignore-path .gitignore $(node $root/addConfig stylelint) --report-needless-disables "**/*.scss"
 
 git ls-files | grep "\.json$" | grep -v package | xargs -I{} fixjson --write "$(pwd)/{}"
 

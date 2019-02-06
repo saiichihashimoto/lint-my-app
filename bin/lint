@@ -1,11 +1,27 @@
-pkg-ok || exit 1
+code=0
+root=$(npm explore lint-my-app -- pwd)
+if [ -z "$root" ]
+then
+	root=.
+fi
 
-eslint --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives $(node $(npm explore lint-my-app -- pwd)/addconfig.js eslint) . || exit 1
+pkg-ok
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
-stylelint --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) "**/*.css" || exit 1
-stylelint --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) --report-needless-disables "**/*.css" || exit 1
+eslint --ignore-path .gitignore --ignore-pattern '!.*.js' --report-unused-disable-directives $(node $root/addConfig eslint) .
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
-stylelint --syntax=scss --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) "**/*.scss" || exit 1
-stylelint --syntax=scss --ignore-path .gitignore $(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint) --report-needless-disables "**/*.scss" || exit 1
+stylelint --ignore-path .gitignore $(node $root/addConfig stylelint) "**/*.css"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
+stylelint --ignore-path .gitignore $(node $root/addConfig stylelint) --report-needless-disables "**/*.css"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
 
-git ls-files | grep "\.json$" | grep -v package | xargs -I{} jsonlint --quiet "$(pwd)/{}" || exit 1
+stylelint --syntax=scss --ignore-path .gitignore $(node $root/addConfig stylelint) "**/*.scss"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
+stylelint --syntax=scss --ignore-path .gitignore $(node $root/addConfig stylelint) --report-needless-disables "**/*.scss"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
+
+git ls-files | grep "\.json$" | grep -v package | xargs -I{} jsonlint --quiet "$(pwd)/{}"
+code=$([[ $code = 0 ]] && echo $? || echo 0)
+
+exit $code

@@ -1,1 +1,7 @@
-lint-staged --config lint-my-app
+if [ -z "$(npm explore lint-my-app -- pwd)" ]
+then
+	lint-staged
+elif
+then
+	lint-staged --config lint-my-app
+fi

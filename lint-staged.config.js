@@ -1,4 +1,8 @@
-const useConfig = (process.cwd() === __dirname) && ' ';
+const addConfig = require('./addConfig');
+
+const eslintConfig = (process.cwd() !== __dirname) ? addConfig('eslint') : '';
+
+const stylelintConfig = (process.cwd() !== __dirname) ? addConfig('stylelint') : '';
 
 module.exports = {
 	'package.json': [
@@ -6,15 +10,17 @@ module.exports = {
 		'git add',
 	],
 	'*.js': [
-		`eslint --fix --ignore-pattern '!.*.js' --report-unused-disable-directives ${useConfig || '$(node $(npm explore lint-my-app -- pwd)/addconfig.js eslint)'}`,
+		`eslint --fix --ignore-pattern '!.*.js' --report-unused-disable-directives ${eslintConfig}`,
 		'git add',
 	],
 	'*.css': [
-		`stylelint --fix ${useConfig || '$(node $(npm explore lint-my-app -- pwd)/addconfig.js stylelint)'}`,
+		`stylelint --fix ${stylelintConfig}`,
+		`stylelint --fix ${stylelintConfig} --report-needless-disables`,
 		'git add',
 	],
 	'*.scss': [
-		`stylelint --fix --syntax=scss ${useConfig || '$(npm explore lint-my-app -- node ./addconfig.js stylelint)'}`,
+		`stylelint --fix --syntax=scss ${stylelintConfig}`,
+		`stylelint --fix --syntax=scss ${stylelintConfig} --report-needless-disables`,
 		'git add',
 	],
 	'!(package|package-lock).json': [

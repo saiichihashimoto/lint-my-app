@@ -22,6 +22,10 @@ function cosmiconfigExists(moduleName) {
 	}
 }
 
-if (!cosmiconfigExists(process.argv[2])) {
-	console.log(`--config ${__dirname}/empty.json`); // eslint-disable-line no-console
+if (require.main === module) {
+	if (!cosmiconfigExists(process.argv[2])) {
+		console.log(`--config ${__dirname}/empty.json`); // eslint-disable-line no-console
+	}
+} else {
+	module.exports = cosmiconfigExists;
 }
