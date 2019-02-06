@@ -1,7 +1,17 @@
 const cosmiconfig = require('cosmiconfig');
 
 const cosmiconfigOptions = {
-	eslint: { packageProp: 'eslintConfig' },
+	eslint: {
+		searchPlaces: [
+			'.eslintrc.js',
+			'.eslintrc.yaml',
+			'.eslintrc.yml',
+			'.eslintrc.json',
+			'.eslintrc',
+			'package.json',
+		],
+		packageProp: 'eslintConfig',
+	},
 };
 
 function cosmiconfigExists(moduleName) {
