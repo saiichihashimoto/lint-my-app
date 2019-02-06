@@ -10,17 +10,17 @@ module.exports = {
 		'git add',
 	],
 	'*.js': [
-		`eslint --fix --ignore-pattern '!.*.js' --report-unused-disable-directives ${eslintConfig}`,
+		`eslint --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${eslintConfig}`,
 		'git add',
 	],
 	'*.css': [
-		`stylelint --fix ${stylelintConfig}`,
-		`stylelint --fix ${stylelintConfig} --report-needless-disables`,
+		`stylelint --fix --color ${stylelintConfig}`,
+		`stylelint --fix --color ${stylelintConfig} --report-needless-disables`,
 		'git add',
 	],
 	'*.scss': [
-		`stylelint --fix --syntax=scss ${stylelintConfig}`,
-		`stylelint --fix --syntax=scss ${stylelintConfig} --report-needless-disables`,
+		`stylelint --syntax=scss --fix --color ${stylelintConfig}`,
+		`stylelint --syntax=scss --fix --color ${stylelintConfig} --report-needless-disables`,
 		'git add',
 	],
 	'!(package|package-lock).json': [
