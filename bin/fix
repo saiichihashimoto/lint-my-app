@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-root=$(npm explore lint-my-app -- pwd >/dev/null 2>&1 || echo .)
+root=$(npm explore lint-my-app -- pwd 2>/dev/null || echo .)
 stylelintConfig=$(node $root/addConfig stylelint)
 
 code=0

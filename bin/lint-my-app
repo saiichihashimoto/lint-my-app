@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-root=$(npm explore lint-my-app -- pwd >/dev/null 2>&1 || echo .)
+root=$(npm explore lint-my-app -- pwd 2>/dev/null || echo .)
 
 if [ -z "$1" ]
 then
