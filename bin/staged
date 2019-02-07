@@ -1,4 +1,7 @@
-if [ -z "$(npm explore lint-my-app -- pwd)" ]
+#!/usr/bin/env bash
+set -e
+
+if [ -z "$(npm explore lint-my-app -- pwd >/dev/null 2>&1)" ]
 then
 	lint-staged
 else

@@ -14,8 +14,8 @@
   "bin": "bin/lint-my-app",
   "scripts": {
     "test": "run-s test:*",
-    "test:fix": "sh ./bin/fix",
-    "test:lint": "sh ./bin/lint"
+    "test:fix": "./bin/fix",
+    "test:lint": "./bin/lint"
   },
   "husky": {
     "hooks": {
