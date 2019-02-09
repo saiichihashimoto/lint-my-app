@@ -2,6 +2,23 @@
   "name": "lint-my-app",
   "version": "0.0.0-development",
   "description": "So you can write your app instead of lint it!",
+  "keywords": [
+    "check",
+    "code",
+    "eslint",
+    "fix",
+    "fixjson",
+    "format",
+    "imagemin",
+    "lint",
+    "lint-staged",
+    "optimize",
+    "quality",
+    "sort",
+    "staged",
+    "stylelint",
+    "validate"
+  ],
   "homepage": "https://saiichihashimoto.github.io/lint-my-app/",
   "bugs": {
     "url": "https://github.com/saiichihashimoto/lint-my-app/issues"
@@ -10,12 +27,13 @@
     "type": "git",
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
+  "license": "MIT",
   "main": "lint-staged.config.js",
   "bin": "bin/lint-my-app",
   "scripts": {
     "test": "run-s test:*",
-    "test:fix": "./bin/fix",
-    "test:lint": "./bin/lint"
+    "test:fix": "./bin/lint-my-app fix",
+    "test:lint": "./bin/lint-my-app lint"
   },
   "husky": {
     "hooks": {
