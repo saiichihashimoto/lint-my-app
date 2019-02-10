@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-if [ -z "$(npm explore lint-my-app -- pwd 2>/dev/null)" ]
-then
-	lint-staged
-else
-	lint-staged --config lint-my-app
-fi
