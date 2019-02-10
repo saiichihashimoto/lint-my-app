@@ -1,28 +1,9 @@
 #!/usr/bin/env node
 const Listr = require('listr');
-const cosmiconfig = require('cosmiconfig');
 const execa = require('execa');
 const path = require('path');
 const program = require('commander');
-
-const cosmiconfigOptions = {
-	eslint: {
-		searchPlaces: [
-			'.eslintrc.js',
-			'.eslintrc.yaml',
-			'.eslintrc.yml',
-			'.eslintrc.json',
-			'.eslintrc',
-			'package.json',
-		],
-		packageProp: 'eslintConfig',
-	},
-	stylelint: {},
-};
-
-const configExists = Object.entries(cosmiconfigOptions)
-	.filter(([moduleName, options]) => Boolean(cosmiconfig(moduleName, options).searchSync()))
-	.reduce((acc, [key]) => ({ ...acc, [key]: true }), {});
+const availableConfigs = require('./available-configs');
 
 program
 	.option('--no-pkg-ok')
@@ -43,7 +24,7 @@ program
 					task:  () => execa(
 						'eslint',
 						[
-							...(!configExists.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+							...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 							'--ignore-path', '.gitignore',
 							'--ignore-pattern', '\'!.*.js\'',
 							'--color',
@@ -66,7 +47,7 @@ program
 							task:  () => execa(
 								'stylelint',
 								[
-									...(!configExists.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+									...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 									'--ignore-path', '.gitignore',
 									'--color',
 									...args,
