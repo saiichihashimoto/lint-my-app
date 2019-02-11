@@ -1,7 +1,7 @@
-const execa = require('execa');
-const path = require('path');
-const availableConfigs = require('./available-configs');
-const lint = require('./lint-my-app-lint');
+import execa from 'execa';
+import path from 'path';
+import availableConfigs from './available-configs';
+import lint from './lint-my-app-lint';
 
 jest.mock('execa');
 

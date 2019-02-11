@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const program = require('commander');
-const { version } = require('../package');
+import program from 'commander';
+import { version } from '../package';
 
 const lintMyApp = program
 	.version(version)
@@ -11,6 +11,5 @@ const lintMyApp = program
 /* istanbul ignore next line */
 if (require.main === module) {
 	lintMyApp.parse(process.argv);
-} else {
-	module.exports = (...args) => lintMyApp.parse([process.argv[0], __filename, ...args]);
 }
+export default (...args) => lintMyApp.parse([process.argv[0], __filename, ...args]);

@@ -28,18 +28,24 @@
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
   "license": "MIT",
-  "main": "lint-staged.config.js",
-  "bin": "bin/lint-my-app.js",
+  "files": [
+    "husky.js",
+    "lib",
+    "lint-staged.config.js"
+  ],
+  "main": "lib/lint-staged.config.js",
+  "bin": "lib/lint-my-app.js",
   "scripts": {
+    "build": "babel src --out-dir lib --source-maps --delete-dir-on-start --verbose --ignore \"**/*.spec.js\" && cp src/*.json lib",
     "fix": "npm run lint-my-app -- fix",
     "lint": "npm run lint-my-app -- lint",
-    "lint-my-app": "./bin/lint-my-app.js",
+    "lint-my-app": "npm run build && ./lib/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
     "test": "if [ -z \"$CI\" ]; then jest --watch; else jest --color --coverage; fi"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
+      "pre-commit": "npm run staged",
       "pre-push": "npm run lint"
     }
   },
@@ -52,9 +58,7 @@
     "extends": "saiichihashimoto"
   },
   "jest": {
-    "collectCoverageFrom": [
-      "bin/**/*.js"
-    ]
+    "testEnvironment": "node"
   },
   "dependencies": {
     "commander": "2.19.0",
@@ -71,6 +75,9 @@
     "stylelint": "9.10.1"
   },
   "devDependencies": {
+    "@babel/cli": "7.2.3",
+    "@babel/core": "7.2.2",
+    "@babel/preset-env": "7.3.1",
     "cz-conventional-changelog": "2.1.0",
     "eslint-config-saiichihashimoto": "1.0.7",
     "husky": "1.3.1",

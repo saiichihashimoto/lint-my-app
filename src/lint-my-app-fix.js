@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-const Listr = require('listr');
-const execa = require('execa');
-const path = require('path');
-const program = require('commander');
-const availableConfigs = require('./available-configs');
+import Listr from 'listr';
+import execa from 'execa';
+import path from 'path';
+import program from 'commander';
+import availableConfigs from './available-configs';
 
-const fix = (args) => {
+function fix(args) {
 	let action = null;
 	program
 		.option('--no-sort-package-json')
@@ -125,7 +125,7 @@ const fix = (args) => {
 		)
 		.parse(args);
 	return action;
-};
+}
 
 /* istanbul ignore next line */
 if (require.main === module) {
@@ -141,6 +141,5 @@ if (require.main === module) {
 
 			process.exit(errors.find(({ code }) => code).code || 1);
 		});
-} else {
-	module.exports = (...args) => fix([process.argv[0], __filename, ...args]);
 }
+export default (...args) => fix([process.argv[0], __filename, ...args]);

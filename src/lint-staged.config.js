@@ -1,5 +1,6 @@
-const availableConfigs = require('./bin/available-configs');
+import availableConfigs from './available-configs';
 
+// Can't use "export default ..." with lint-staged
 module.exports = {
 	'package.json': [
 		'sort-package-json',

@@ -1,7 +1,7 @@
-const EventEmitter = require('events');
-const childProcess = require('child_process');
-const path = require('path');
-const lintMyApp = require('./lint-my-app');
+import EventEmitter from 'events';
+import childProcess from 'child_process';
+import path from 'path';
+import lintMyApp from './lint-my-app';
 
 jest.mock('child_process');
 

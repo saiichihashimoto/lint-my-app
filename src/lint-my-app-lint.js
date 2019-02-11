@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-const Listr = require('listr');
-const execa = require('execa');
-const path = require('path');
-const program = require('commander');
-const availableConfigs = require('./available-configs');
+import Listr from 'listr';
+import execa from 'execa';
+import path from 'path';
+import program from 'commander';
+import availableConfigs from './available-configs';
 
-const lint = (args) => {
+function lint(args) {
 	let action = null;
 	program
 		.option('--no-pkg-ok')
@@ -97,7 +97,7 @@ const lint = (args) => {
 		})
 		.parse(args);
 	return action;
-};
+}
 
 /* istanbul ignore next line */
 if (require.main === module) {
@@ -113,6 +113,5 @@ if (require.main === module) {
 
 			process.exit(errors.find(({ code }) => code).code || 1);
 		});
-} else {
-	module.exports = (...args) => lint([process.argv[0], __filename, ...args]);
 }
+export default (...args) => lint([process.argv[0], __filename, ...args]);

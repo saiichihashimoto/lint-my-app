@@ -1,4 +1,4 @@
-const cosmiconfig = require('cosmiconfig');
+import cosmiconfig from 'cosmiconfig';
 
 const cosmiconfigOptions = {
 	eslint: {
@@ -15,6 +15,6 @@ const cosmiconfigOptions = {
 	stylelint: {},
 };
 
-module.exports = Object.entries(cosmiconfigOptions)
+export default Object.entries(cosmiconfigOptions)
 	.filter(([moduleName, options]) => Boolean(cosmiconfig(moduleName, options).searchSync()))
 	.reduce((acc, [key]) => ({ ...acc, [key]: true }), {});
