@@ -1,9 +1,10 @@
-node_modules/
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
+*.log
 *.sublime-project
 *.sublime-workspace
-*.log
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+coverage
+node_modules/
 yarn.lock

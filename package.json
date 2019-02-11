@@ -51,6 +51,11 @@
   "eslintConfig": {
     "extends": "saiichihashimoto"
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "bin/**/*.js"
+    ]
+  },
   "dependencies": {
     "commander": "2.19.0",
     "cosmiconfig": "^5.0.7",
