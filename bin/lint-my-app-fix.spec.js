@@ -1,7 +1,7 @@
 const execa = require('execa');
 const path = require('path');
 const availableConfigs = require('./available-configs');
-const lint = require('./lint-my-app-lint');
+const fix = require('./lint-my-app-fix');
 
 jest.mock('execa');
 
@@ -17,10 +17,10 @@ describe('lint-my-app lint', () => {
 		execa.mockClear();
 	});
 
-	it('executes all linters', async() => {
-		await lint();
+	it('executes all fixers', async() => {
+		await fix();
 
-		expect(execa).toHaveBeenCalledWith('pkg-ok');
+		expect(execa).toHaveBeenCalledWith('sort-package-json');
 
 		expect(execa).toHaveBeenCalledWith(
 			'eslint',
@@ -28,6 +28,7 @@ describe('lint-my-app lint', () => {
 				'--ignore-path', '.gitignore',
 				'--ignore-pattern', '\'!.*.js\'',
 				'--color',
+				'--fix',
 				'--report-unused-disable-directives',
 				'.',
 			],
@@ -39,6 +40,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 			],
 		);
@@ -48,6 +50,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 				'--report-needless-disables',
 			],
@@ -58,6 +61,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 			],
@@ -68,34 +72,47 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 				'--report-needless-disables',
 			],
 		);
 
+		// TODO How to check if it's been called with this twice?
 		expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
+
 		expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
 		expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
 		expect(execa).toHaveBeenCalledWith(
 			'xargs',
 			[
 				'-I{}',
-				'jsonlint',
-				'--quiet',
+				'fixjson',
+				'--write',
 				'"{}"',
+			],
+		);
+
+		expect(execa).toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
+		expect(execa).toHaveBeenCalledWith(
+			'xargs',
+			[
+				'-I{}',
+				'imagemin-lint-staged',
+				'{}',
 			],
 		);
 	});
 
-	it('doesn\'t execute pkg-ok with --no-pkg-ok', async() => {
-		await lint('--no-pkg-ok');
+	it('doesn\'t execute sort-package-json with --no-sort-package-json', async() => {
+		await fix('--no-sort-package-json');
 
-		expect(execa).not.toHaveBeenCalledWith('pkg-ok');
+		expect(execa).not.toHaveBeenCalledWith('sort-package-json');
 	});
 
 	it('doesn\'t execute eslint with --no-eslint', async() => {
-		await lint('--no-eslint');
+		await fix('--no-eslint');
 
 		expect(execa).not.toHaveBeenCalledWith(
 			'eslint',
@@ -103,6 +120,7 @@ describe('lint-my-app lint', () => {
 				'--ignore-path', '.gitignore',
 				'--ignore-pattern', '\'!.*.js\'',
 				'--color',
+				'--fix',
 				'--report-unused-disable-directives',
 				'.',
 			],
@@ -110,7 +128,7 @@ describe('lint-my-app lint', () => {
 	});
 
 	it('doesn\'t execute stylelint with --no-stylelint', async() => {
-		await lint('--no-stylelint');
+		await fix('--no-stylelint');
 
 		expect(execa).not.toHaveBeenCalledWith(
 			'stylelint',
@@ -118,6 +136,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 			],
 		);
@@ -127,6 +146,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 				'--report-needless-disables',
 			],
@@ -137,6 +157,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 			],
@@ -147,6 +168,7 @@ describe('lint-my-app lint', () => {
 				'--config', path.resolve(__dirname, 'empty.json'),
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 				'--report-needless-disables',
@@ -154,19 +176,36 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute jsonlint with --no-jsonlint', async() => {
-		await lint('--no-jsonlint');
+	it('doesn\'t execute fixjson with --no-fixjson', async() => {
+		await fix('--no-fixjson');
 
-		expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
+		// TODO How to check if it's been called with this once?
+		// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 		expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
 		expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
 		expect(execa).not.toHaveBeenCalledWith(
 			'xargs',
 			[
 				'-I{}',
-				'jsonlint',
-				'--quiet',
+				'fixjson',
+				'--write',
 				'"{}"',
+			],
+		);
+	});
+
+	it('doesn\'t execute imagemin with --no-imagemin', async() => {
+		await fix('--no-imagemin');
+
+		// TODO How to check if it's been called with this once?
+		// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
+		expect(execa).not.toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
+		expect(execa).not.toHaveBeenCalledWith(
+			'xargs',
+			[
+				'-I{}',
+				'imagemin-lint-staged',
+				'{}',
 			],
 		);
 	});
@@ -175,7 +214,7 @@ describe('lint-my-app lint', () => {
 		const valueBefore = availableConfigs.eslint;
 		availableConfigs.eslint = false;
 
-		await lint();
+		await fix();
 
 		expect(execa).toHaveBeenCalledWith(
 			'eslint',
@@ -184,6 +223,7 @@ describe('lint-my-app lint', () => {
 				'--ignore-path', '.gitignore',
 				'--ignore-pattern', '\'!.*.js\'',
 				'--color',
+				'--fix',
 				'--report-unused-disable-directives',
 				'.',
 			],
@@ -196,13 +236,14 @@ describe('lint-my-app lint', () => {
 		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 
-		await lint();
+		await fix();
 
 		expect(execa).toHaveBeenCalledWith(
 			'stylelint',
 			[
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 			],
 		);
@@ -211,6 +252,7 @@ describe('lint-my-app lint', () => {
 			[
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.css"',
 				'--report-needless-disables',
 			],
@@ -220,6 +262,7 @@ describe('lint-my-app lint', () => {
 			[
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 			],
@@ -229,6 +272,7 @@ describe('lint-my-app lint', () => {
 			[
 				'--ignore-path', '.gitignore',
 				'--color',
+				'--fix',
 				'"**/*.scss"',
 				'--syntax=scss',
 				'--report-needless-disables',
