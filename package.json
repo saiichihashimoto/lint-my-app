@@ -35,7 +35,7 @@
     "lint": "npm run lint-my-app -- lint",
     "lint-my-app": "./bin/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
-    "test": "jest --env node"
+    "test": "if [ -z \"$CI\" ]; then jest --watch; else jest --color --coverage; fi"
   },
   "husky": {
     "hooks": {
