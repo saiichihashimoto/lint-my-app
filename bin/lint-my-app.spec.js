@@ -8,7 +8,6 @@ jest.mock('child_process');
 const nodePath = process.argv[0];
 
 describe('lint-my-app', () => {
-	// commander attaches to a spawn
 	childProcess.spawn.mockImplementation(() => new EventEmitter());
 
 	beforeEach(() => {

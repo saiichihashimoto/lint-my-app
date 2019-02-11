@@ -8,6 +8,7 @@ const lintMyApp = program
 	.command('fix', 'lint --fixes your app')
 	.command('staged', 'lint --fixes your staged files');
 
+/* istanbul ignore next line */
 if (require.main === module) {
 	lintMyApp.parse(process.argv);
 } else {

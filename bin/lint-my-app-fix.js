@@ -5,7 +5,7 @@ const path = require('path');
 const program = require('commander');
 const availableConfigs = require('./available-configs');
 
-program
+const fix = program
 	.option('--no-sort-package-json')
 	.option('--no-eslint')
 	.option('--no-stylelint')
@@ -126,5 +126,11 @@ program
 
 				process.exit(errors.find((err) => err.code) || 1);
 			}),
-	)
-	.parse(process.argv);
+	);
+
+/* istanbul ignore next line */
+if (require.main === module) {
+	fix.parse(process.argv);
+} else {
+	module.exports = (...args) => fix.parse([process.argv[0], __filename, ...args]);
+}
