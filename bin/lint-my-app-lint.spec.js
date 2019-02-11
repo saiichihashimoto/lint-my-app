@@ -17,7 +17,7 @@ describe('lint-my-app lint', () => {
 		execa.mockClear();
 	});
 
-	it('executes all linters', async() => {
+	it('executes all linters', async () => {
 		await lint();
 
 		expect(execa).toHaveBeenCalledWith('pkg-ok');
@@ -88,13 +88,13 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute pkg-ok with --no-pkg-ok', async() => {
+	it('doesn\'t execute pkg-ok with --no-pkg-ok', async () => {
 		await lint('--no-pkg-ok');
 
 		expect(execa).not.toHaveBeenCalledWith('pkg-ok');
 	});
 
-	it('doesn\'t execute eslint with --no-eslint', async() => {
+	it('doesn\'t execute eslint with --no-eslint', async () => {
 		await lint('--no-eslint');
 
 		expect(execa).not.toHaveBeenCalledWith(
@@ -109,7 +109,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute stylelint with --no-stylelint', async() => {
+	it('doesn\'t execute stylelint with --no-stylelint', async () => {
 		await lint('--no-stylelint');
 
 		expect(execa).not.toHaveBeenCalledWith(
@@ -154,7 +154,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute jsonlint with --no-jsonlint', async() => {
+	it('doesn\'t execute jsonlint with --no-jsonlint', async () => {
 		await lint('--no-jsonlint');
 
 		expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
@@ -171,7 +171,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('executes eslint with empty config', async() => {
+	it('executes eslint with empty config', async () => {
 		const valueBefore = availableConfigs.eslint;
 		availableConfigs.eslint = false;
 
@@ -192,7 +192,7 @@ describe('lint-my-app lint', () => {
 		availableConfigs.eslint = valueBefore;
 	});
 
-	it('executes stylelint with provided config', async() => {
+	it('executes stylelint with provided config', async () => {
 		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 

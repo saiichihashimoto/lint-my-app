@@ -111,7 +111,7 @@ if (require.main === module) {
 				.filter(({ stderr }) => stderr)
 				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
 
-			process.exit(errors.find((err2) => err2.code) || 1);
+			process.exit(errors.find(({ code }) => code).code || 1);
 		});
 } else {
 	module.exports = (...args) => lint([process.argv[0], __filename, ...args]);

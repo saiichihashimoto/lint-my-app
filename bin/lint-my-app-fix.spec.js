@@ -17,7 +17,7 @@ describe('lint-my-app lint', () => {
 		execa.mockClear();
 	});
 
-	it('executes all fixers', async() => {
+	it('executes all fixers', async () => {
 		await fix();
 
 		expect(execa).toHaveBeenCalledWith('sort-package-json');
@@ -105,13 +105,13 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute sort-package-json with --no-sort-package-json', async() => {
+	it('doesn\'t execute sort-package-json with --no-sort-package-json', async () => {
 		await fix('--no-sort-package-json');
 
 		expect(execa).not.toHaveBeenCalledWith('sort-package-json');
 	});
 
-	it('doesn\'t execute eslint with --no-eslint', async() => {
+	it('doesn\'t execute eslint with --no-eslint', async () => {
 		await fix('--no-eslint');
 
 		expect(execa).not.toHaveBeenCalledWith(
@@ -127,7 +127,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute stylelint with --no-stylelint', async() => {
+	it('doesn\'t execute stylelint with --no-stylelint', async () => {
 		await fix('--no-stylelint');
 
 		expect(execa).not.toHaveBeenCalledWith(
@@ -176,7 +176,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute fixjson with --no-fixjson', async() => {
+	it('doesn\'t execute fixjson with --no-fixjson', async () => {
 		await fix('--no-fixjson');
 
 		// TODO How to check if it's been called with this once?
@@ -194,7 +194,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('doesn\'t execute imagemin with --no-imagemin', async() => {
+	it('doesn\'t execute imagemin with --no-imagemin', async () => {
 		await fix('--no-imagemin');
 
 		// TODO How to check if it's been called with this once?
@@ -210,7 +210,7 @@ describe('lint-my-app lint', () => {
 		);
 	});
 
-	it('executes eslint with empty config', async() => {
+	it('executes eslint with empty config', async () => {
 		const valueBefore = availableConfigs.eslint;
 		availableConfigs.eslint = false;
 
@@ -232,7 +232,7 @@ describe('lint-my-app lint', () => {
 		availableConfigs.eslint = valueBefore;
 	});
 
-	it('executes stylelint with provided config', async() => {
+	it('executes stylelint with provided config', async () => {
 		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 

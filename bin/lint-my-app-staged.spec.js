@@ -11,7 +11,7 @@ describe('lint-my-app', () => {
 		execa.mockClear();
 	});
 
-	it('executes lint-staged', async() => {
+	it('executes lint-staged', async () => {
 		await expect(staged()).resolves;
 
 		expect(execa).toHaveBeenCalledWith(
