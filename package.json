@@ -30,8 +30,7 @@
   "license": "MIT",
   "files": [
     "husky.js",
-    "lib",
-    "lint-staged.config.js"
+    "lib"
   ],
   "main": "lib/lint-staged.config.js",
   "bin": "lib/lint-my-app.js",

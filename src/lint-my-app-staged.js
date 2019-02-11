@@ -23,6 +23,7 @@ function staged(args) {
 
 /* istanbul ignore next line */
 if (require.main === module) {
-	staged(process.argv);
+	staged(process.argv)
+		.catch(({ code }) => process.exit(code || 1));
 }
 export default (...args) => staged([process.argv[0], __filename, ...args]);
