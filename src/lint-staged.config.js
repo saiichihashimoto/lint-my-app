@@ -2,7 +2,7 @@ import availableConfigs from './available-configs';
 
 // Can't use "export default ..." with lint-staged
 module.exports = {
-	'package.json': [
+	'**/package.json': [
 		'sort-package-json',
 		'git add',
 	],
@@ -20,7 +20,7 @@ module.exports = {
 		`stylelint --syntax=scss --fix --color ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''} --report-needless-disables`,
 		'git add',
 	],
-	'!(package|package-lock).json': [
+	'**/!(package|package-lock).json': [
 		'fixjson --write',
 		'git add',
 	],
