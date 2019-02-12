@@ -23,13 +23,30 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('sort-package-json');
+			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
+			expect(execa).toHaveBeenCalledWith('grep', ['package\\.json$']);
+			expect(execa).toHaveBeenCalledWith(
+				'xargs',
+				[
+					'-I{}',
+					'sort-package-json',
+					'{}',
+				],
+			);
 		});
 
 		it('--no-sort-package-json', async () => {
 			await fix('--no-sort-package-json');
 
-			expect(execa).not.toHaveBeenCalledWith('sort-package-json');
+			expect(execa).not.toHaveBeenCalledWith('grep', ['package\\.json$']);
+			expect(execa).not.toHaveBeenCalledWith(
+				'xargs',
+				[
+					'-I{}',
+					'sort-package-json',
+					'{}',
+				],
+			);
 		});
 	});
 
@@ -243,7 +260,6 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
-			// TODO How to check if it's been called with this twice?
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
@@ -261,7 +277,6 @@ describe('lint-my-app fix', () => {
 		it('--no-fixjson', async () => {
 			await fix('--no-fixjson');
 
-			// TODO How to check if it's been called with this once?
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
@@ -281,7 +296,6 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
-			// TODO How to check if it's been called with this twice?
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
 			expect(execa).toHaveBeenCalledWith(
@@ -297,7 +311,6 @@ describe('lint-my-app fix', () => {
 		it('--no-imagemin', async () => {
 			await fix('--no-imagemin');
 
-			// TODO How to check if it's been called with this once?
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
 			expect(execa).not.toHaveBeenCalledWith(

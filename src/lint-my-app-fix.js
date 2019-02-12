@@ -20,7 +20,24 @@ function fix(args) {
 						{
 							title: 'sort-package-json',
 							skip:  () => !sortPackageJson,
-							task:  () => execa('sort-package-json'),
+							task:  () => {
+								const gitLs = execa('git', ['ls-files']);
+								const grepPackageJson = execa('grep', ['package\\.json$']);
+
+								const packageJson = execa(
+									'xargs',
+									[
+										'-I{}',
+										'sort-package-json',
+										'{}',
+									],
+								);
+
+								gitLs.stdout.pipe(grepPackageJson.stdin);
+								grepPackageJson.stdout.pipe(packageJson.stdin);
+
+								return packageJson;
+							},
 						},
 						{
 							title: 'eslint --fix',
