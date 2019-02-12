@@ -22,6 +22,7 @@ module.exports = {
 	],
 	'**/!(package|package-lock).json': [
 		'fixjson --write',
+		'jsonlint --quiet',
 		'git add',
 	],
 	'*.{png,jpeg,jpg,gif,svg}': [
