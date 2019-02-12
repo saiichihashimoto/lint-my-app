@@ -40,7 +40,7 @@
     "lint": "npm run lint-my-app -- lint",
     "lint-my-app": "npm run build && ./lib/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
-    "test": "if [ -z \"$CI\" ]; then jest --watch; else jest --color --coverage; fi"
+    "test": "jest --verbose $(if [ -z \"$CI\" ]; then echo --watch; else echo --color --coverage; fi)"
   },
   "husky": {
     "hooks": {

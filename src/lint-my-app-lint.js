@@ -2,12 +2,12 @@
 import Listr from 'listr';
 import execa from 'execa';
 import path from 'path';
-import program from 'commander';
+import { Command } from 'commander';
 import availableConfigs from './available-configs';
 
 function lint(args) {
 	let action = null;
-	program
+	new Command()
 		.option('--no-pkg-ok')
 		.option('--no-eslint')
 		.option('--no-stylelint')

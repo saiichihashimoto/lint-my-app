@@ -4,10 +4,10 @@ import staged from './lint-my-app-staged';
 
 jest.mock('execa');
 
-describe('lint-my-app', () => {
+describe('lint-my-app staged', () => {
 	execa.mockImplementation(() => Promise.resolve());
 
-	beforeEach(() => {
+	afterEach(() => {
 		execa.mockClear();
 	});
 
