@@ -6,142 +6,141 @@ import { Command } from 'commander';
 import availableConfigs from './available-configs';
 
 function fix(args) {
-	let action = null;
-	new Command()
+	const command = new Command();
+
+	command
 		.option('--no-sort-package-json')
 		.option('--no-eslint')
 		.option('--no-stylelint')
 		.option('--no-fixjson')
 		.option('--no-imagemin')
-		.action(
-			({ sortPackageJson, eslint, stylelint, fixjson, imagemin }) => {
-				action = new Listr(
+		.parse(args);
+
+	const { sortPackageJson, eslint, stylelint, fixjson, imagemin } = command;
+
+	return new Listr(
+		[
+			{
+				title: 'sort-package-json',
+				skip:  () => !sortPackageJson,
+				task:  () => {
+					const gitLs = execa('git', ['ls-files']);
+					const grepPackageJson = execa('grep', ['package\\.json$']);
+
+					const packageJson = execa(
+						'xargs',
+						[
+							'-I{}',
+							'sort-package-json',
+							'{}',
+						],
+					);
+
+					gitLs.stdout.pipe(grepPackageJson.stdin);
+					grepPackageJson.stdout.pipe(packageJson.stdin);
+
+					return packageJson;
+				},
+			},
+			{
+				title: 'eslint --fix',
+				skip:  () => !eslint,
+				task:  () => execa(
+					'eslint',
 					[
-						{
-							title: 'sort-package-json',
-							skip:  () => !sortPackageJson,
-							task:  () => {
-								const gitLs = execa('git', ['ls-files']);
-								const grepPackageJson = execa('grep', ['package\\.json$']);
-
-								const packageJson = execa(
-									'xargs',
-									[
-										'-I{}',
-										'sort-package-json',
-										'{}',
-									],
-								);
-
-								gitLs.stdout.pipe(grepPackageJson.stdin);
-								grepPackageJson.stdout.pipe(packageJson.stdin);
-
-								return packageJson;
-							},
-						},
-						{
-							title: 'eslint --fix',
-							skip:  () => !eslint,
-							task:  () => execa(
-								'eslint',
-								[
-									...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-									'--ignore-path', '.gitignore',
-									'--ignore-pattern', '\'!.*.js\'',
-									'--color',
-									'--fix',
-									'--report-unused-disable-directives',
-									'.',
-								].filter(Boolean),
-							),
-						},
-						{
-							title: 'stylelint --fix',
-							skip:  () => !stylelint,
-							task:  () => new Listr(
-								[
-									['"**/*.css"'],
-									['"**/*.css"', '--report-needless-disables'],
-									['"**/*.scss"', '--syntax=scss'],
-									['"**/*.scss"', '--syntax=scss', '--report-needless-disables'],
-								].map((styleArgs) => ({
-									title: styleArgs.join(' '),
-									task:  () => execa(
-										'stylelint',
-										[
-											...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-											'--ignore-path', '.gitignore',
-											'--color',
-											'--fix',
-											...styleArgs,
-										].filter(Boolean),
-									),
-								})),
-								{
-									renderer:    process.env.NODE_ENV === 'test' ? 'silent' : /* istanbul ignore next */ 'default',
-									exitOnError: false,
-								},
-							),
-						},
-						{
-							title: 'fixjson',
-							skip:  () => !fixjson,
-							task:  () => {
-								const gitLs = execa('git', ['ls-files']);
-								const grepJson = execa('grep', ['\\.json$']);
-								const noPackage = execa('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-
-								const xargsFixJson = execa(
-									'xargs',
-									[
-										'-I{}',
-										'fixjson',
-										'--write',
-										'"{}"',
-									],
-								);
-
-								gitLs.stdout.pipe(grepJson.stdin);
-								grepJson.stdout.pipe(noPackage.stdin);
-								noPackage.stdout.pipe(xargsFixJson.stdin);
-
-								return xargsFixJson;
-							},
-						},
-						{
-							title: 'imagemin',
-							skip:  () => !imagemin,
-							task:  () => {
-								const gitLs = execa('git', ['ls-files']);
-								const images = execa('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-
-								const xargsImagemin = execa(
-									'xargs',
-									[
-										'-I{}',
-										'imagemin-lint-staged',
-										'{}',
-									],
-								);
-
-								gitLs.stdout.pipe(images.stdin);
-								images.stdout.pipe(xargsImagemin.stdin);
-
-								return xargsImagemin;
-							},
-						},
-					],
+						...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+						'--ignore-path', '.gitignore',
+						'--ignore-pattern', '\'!.*.js\'',
+						'--color',
+						'--fix',
+						'--report-unused-disable-directives',
+						'.',
+					].filter(Boolean),
+				),
+			},
+			{
+				title: 'stylelint --fix',
+				skip:  () => !stylelint,
+				task:  () => new Listr(
+					[
+						['"**/*.css"'],
+						['"**/*.css"', '--report-needless-disables'],
+						['"**/*.scss"', '--syntax=scss'],
+						['"**/*.scss"', '--syntax=scss', '--report-needless-disables'],
+					].map((styleArgs) => ({
+						title: styleArgs.join(' '),
+						task:  () => execa(
+							'stylelint',
+							[
+								...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+								'--ignore-path', '.gitignore',
+								'--color',
+								'--fix',
+								...styleArgs,
+							].filter(Boolean),
+						),
+					})),
 					{
 						renderer:    process.env.NODE_ENV === 'test' ? 'silent' : /* istanbul ignore next */ 'default',
 						exitOnError: false,
-						concurrent:  true,
 					},
-				)
-					.run();
+				),
 			},
-		)
-		.parse(args);
-	return action;
+			{
+				title: 'fixjson',
+				skip:  () => !fixjson,
+				task:  () => {
+					const gitLs = execa('git', ['ls-files']);
+					const grepJson = execa('grep', ['\\.json$']);
+					const noPackage = execa('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
+
+					const xargsFixJson = execa(
+						'xargs',
+						[
+							'-I{}',
+							'fixjson',
+							'--write',
+							'"{}"',
+						],
+					);
+
+					gitLs.stdout.pipe(grepJson.stdin);
+					grepJson.stdout.pipe(noPackage.stdin);
+					noPackage.stdout.pipe(xargsFixJson.stdin);
+
+					return xargsFixJson;
+				},
+			},
+			{
+				title: 'imagemin',
+				skip:  () => !imagemin,
+				task:  () => {
+					const gitLs = execa('git', ['ls-files']);
+					const images = execa('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
+
+					const xargsImagemin = execa(
+						'xargs',
+						[
+							'-I{}',
+							'imagemin-lint-staged',
+							'{}',
+						],
+					);
+
+					gitLs.stdout.pipe(images.stdin);
+					images.stdout.pipe(xargsImagemin.stdin);
+
+					return xargsImagemin;
+				},
+			},
+		],
+		{
+			renderer:    process.env.NODE_ENV === 'test' ? 'silent' : /* istanbul ignore next */ 'default',
+			exitOnError: false,
+			concurrent:  true,
+		},
+	)
+		.run();
 }
 
 /* istanbul ignore next line */
