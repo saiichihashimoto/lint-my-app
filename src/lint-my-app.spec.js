@@ -8,10 +8,12 @@ jest.mock('child_process');
 describe('lint-my-app', () => {
 	const nodePath = process.argv[0];
 
-	childProcess.spawn.mockImplementation(() => new EventEmitter());
+	beforeEach(() => {
+		childProcess.spawn.mockImplementation(() => new EventEmitter());
+	});
 
 	afterEach(() => {
-		childProcess.spawn.mockClear();
+		jest.resetAllMocks();
 	});
 
 	it('spawns lint-my-app-lint', () => {

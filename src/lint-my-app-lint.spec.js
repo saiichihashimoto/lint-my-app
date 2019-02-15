@@ -8,15 +8,17 @@ jest.mock('execa');
 describe('lint-my-app lint', () => {
 	const emptyJson = path.resolve(__dirname, 'empty.json');
 
-	execa.mockImplementation(() => {
-		const promise = Promise.resolve();
-		promise.stdin = jest.fn();
-		promise.stdout = { pipe: jest.fn() };
-		return promise;
+	beforeEach(() => {
+		execa.mockImplementation(() => {
+			const promise = Promise.resolve();
+			promise.stdin = jest.fn();
+			promise.stdout = { pipe: jest.fn() };
+			return promise;
+		});
 	});
 
 	afterEach(() => {
-		execa.mockClear();
+		jest.resetAllMocks();
 	});
 
 	describe('pkg-ok', () => {
