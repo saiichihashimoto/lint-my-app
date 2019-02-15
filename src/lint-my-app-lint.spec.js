@@ -231,15 +231,7 @@ describe('lint-my-app lint', () => {
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'jsonlint',
-					'--quiet',
-					'"{}"',
-				],
-			);
+			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'jsonlint', '--quiet', '"{}"']);
 		});
 
 		it('--no-jsonlint', async () => {
@@ -248,15 +240,7 @@ describe('lint-my-app lint', () => {
 			expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'jsonlint',
-					'--quiet',
-					'"{}"',
-				],
-			);
+			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'jsonlint', '--quiet', '"{}"']);
 		});
 	});
 });

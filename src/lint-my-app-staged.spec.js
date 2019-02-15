@@ -14,14 +14,6 @@ describe('lint-my-app staged', () => {
 	it('executes lint-staged', async () => {
 		await expect(staged()).resolves;
 
-		expect(execa).toHaveBeenCalledWith(
-			'lint-staged',
-			[
-				'--config', path.resolve(__dirname, 'lint-staged.config.js'),
-			],
-			{
-				stdio: [process.stdin, process.stdout, process.stderr],
-			},
-		);
+		expect(execa).toHaveBeenCalledWith('lint-staged', ['--config', path.resolve(__dirname, 'lint-staged.config.js')], expect.anything());
 	});
 });

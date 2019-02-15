@@ -25,28 +25,14 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['package\\.json$']);
-			expect(execa).toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'sort-package-json',
-					'{}',
-				],
-			);
+			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
 		});
 
 		it('--no-sort-package-json', async () => {
 			await fix('--no-sort-package-json');
 
 			expect(execa).not.toHaveBeenCalledWith('grep', ['package\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'sort-package-json',
-					'{}',
-				],
-			);
+			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
 		});
 	});
 
@@ -263,15 +249,7 @@ describe('lint-my-app fix', () => {
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'fixjson',
-					'--write',
-					'"{}"',
-				],
-			);
+			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'fixjson', '--write', '"{}"']);
 		});
 
 		it('--no-fixjson', async () => {
@@ -280,15 +258,7 @@ describe('lint-my-app fix', () => {
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'fixjson',
-					'--write',
-					'"{}"',
-				],
-			);
+			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'fixjson', '--write', '"{}"']);
 		});
 	});
 
@@ -298,14 +268,7 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-			expect(execa).toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'imagemin-lint-staged',
-					'{}',
-				],
-			);
+			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'imagemin-lint-staged', '{}']);
 		});
 
 		it('--no-imagemin', async () => {
@@ -313,14 +276,7 @@ describe('lint-my-app fix', () => {
 
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-			expect(execa).not.toHaveBeenCalledWith(
-				'xargs',
-				[
-					'-I{}',
-					'imagemin-lint-staged',
-					'{}',
-				],
-			);
+			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'imagemin-lint-staged', '{}']);
 		});
 	});
 });
