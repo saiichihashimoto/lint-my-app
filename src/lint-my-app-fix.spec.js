@@ -28,8 +28,8 @@ describe('lint-my-app fix', () => {
 			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
 		});
 
-		it('--no-sort-package-json', async () => {
-			await fix('--no-sort-package-json');
+		it('can be disabled', async () => {
+			await fix({ sortPackageJson: false });
 
 			expect(execa).not.toHaveBeenCalledWith('grep', ['package\\.json$']);
 			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
@@ -53,8 +53,8 @@ describe('lint-my-app fix', () => {
 			);
 		});
 
-		it('--no-eslint', async () => {
-			await fix('--no-eslint');
+		it('can be disabled', async () => {
+			await fix({ eslint: false });
 
 			expect(execa).not.toHaveBeenCalledWith(
 				'eslint',
@@ -142,8 +142,8 @@ describe('lint-my-app fix', () => {
 			);
 		});
 
-		it('--no-stylelint', async () => {
-			await fix('--no-stylelint');
+		it('can be disabled', async () => {
+			await fix({ stylelint: false });
 
 			expect(execa).not.toHaveBeenCalledWith(
 				'stylelint',
@@ -252,8 +252,8 @@ describe('lint-my-app fix', () => {
 			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'fixjson', '--write', '"{}"']);
 		});
 
-		it('--no-fixjson', async () => {
-			await fix('--no-fixjson');
+		it('can be disabled', async () => {
+			await fix({ fixjson: false });
 
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
@@ -271,8 +271,8 @@ describe('lint-my-app fix', () => {
 			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'imagemin-lint-staged', '{}']);
 		});
 
-		it('--no-imagemin', async () => {
-			await fix('--no-imagemin');
+		it('can be disabled', async () => {
+			await fix({ imagemin: false });
 
 			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);

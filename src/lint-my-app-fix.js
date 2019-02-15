@@ -2,22 +2,16 @@
 import Listr from 'listr';
 import execa from 'execa';
 import path from 'path';
-import { Command } from 'commander';
+import program from 'commander';
 import availableConfigs from './available-configs';
 
-function fix(args) {
-	const command = new Command();
-
-	command
-		.option('--no-sort-package-json')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-fixjson')
-		.option('--no-imagemin')
-		.parse(args);
-
-	const { sortPackageJson, eslint, stylelint, fixjson, imagemin } = command;
-
+function fix({
+	sortPackageJson = true,
+	eslint = true,
+	stylelint = true,
+	fixjson = true,
+	imagemin = true,
+} = {}) {
 	return new Listr(
 		[
 			{
@@ -145,7 +139,15 @@ function fix(args) {
 
 /* istanbul ignore next line */
 if (require.main === module) {
-	fix(process.argv)
+	program
+		.option('--no-sort-package-json')
+		.option('--no-eslint')
+		.option('--no-stylelint')
+		.option('--no-fixjson')
+		.option('--no-imagemin')
+		.parse(process.argv);
+
+	fix(program)
 		.catch((err) => {
 			const { errors = [] } = err;
 			errors
@@ -155,7 +157,7 @@ if (require.main === module) {
 				.filter(({ stderr }) => stderr)
 				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
 
-			process.exit(errors.find(({ code }) => code).code || 1);
+			process.exit((errors.find(({ code }) => code) || {}).code || 1);
 		});
 }
-export default (...args) => fix([process.argv[0], __filename, ...args]);
+export default fix;

@@ -5,6 +5,8 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Greenkeeper badge](https://badges.greenkeeper.io/saiichihashimoto/lint-my-app.svg)](https://greenkeeper.io/)
 
+So you can write your app instead of lint it!
+
 [lint-staged](https://github.com/okonet/lint-staged) keeps the :poop: out of your app. I got tired of configuring [husky](https://github.com/typicode/husky) and lint-staged to get started. lint-my-app sets sane linting defaults so you can write your app instead of lint it!
 
 # Install

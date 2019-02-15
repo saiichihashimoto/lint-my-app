@@ -26,8 +26,8 @@ describe('lint-my-app lint', () => {
 			expect(execa).toHaveBeenCalledWith('pkg-ok');
 		});
 
-		it('--no-pkg-ok', async () => {
-			await lint('--no-pkg-ok');
+		it('can be disabled', async () => {
+			await lint({ pkgOk: false });
 
 			expect(execa).not.toHaveBeenCalledWith('pkg-ok');
 		});
@@ -49,8 +49,8 @@ describe('lint-my-app lint', () => {
 			);
 		});
 
-		it('--no-eslint', async () => {
-			await lint('--no-eslint');
+		it('can be disabled', async () => {
+			await lint({ eslint: false });
 
 			expect(execa).not.toHaveBeenCalledWith(
 				'eslint',
@@ -132,8 +132,8 @@ describe('lint-my-app lint', () => {
 			);
 		});
 
-		it('--no-stylelint', async () => {
-			await lint('--no-stylelint');
+		it('can be disabled', async () => {
+			await lint({ stylelint: false });
 
 			expect(execa).not.toHaveBeenCalledWith(
 				'stylelint',
@@ -234,8 +234,8 @@ describe('lint-my-app lint', () => {
 			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'jsonlint', '--quiet', '"{}"']);
 		});
 
-		it('--no-jsonlint', async () => {
-			await lint('--no-jsonlint');
+		it('can be disabled', async () => {
+			await lint({ jsonlint: false });
 
 			expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
 			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);

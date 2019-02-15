@@ -2,21 +2,10 @@
 import Listr from 'listr';
 import execa from 'execa';
 import path from 'path';
-import { Command } from 'commander';
+import program from 'commander';
 import availableConfigs from './available-configs';
 
-function lint(args) {
-	const command = new Command();
-
-	command
-		.option('--no-pkg-ok')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-jsonlint')
-		.parse(args);
-
-	const { pkgOk, eslint, stylelint, jsonlint } = command;
-
+function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true } = {}) {
 	return new Listr(
 		[
 			{
@@ -102,7 +91,14 @@ function lint(args) {
 
 /* istanbul ignore next line */
 if (require.main === module) {
-	lint(process.argv)
+	program
+		.option('--no-pkg-ok')
+		.option('--no-eslint')
+		.option('--no-stylelint')
+		.option('--no-jsonlint')
+		.parse(process.argv);
+
+	lint(program)
 		.catch((err) => {
 			const { errors = [] } = err;
 			errors
@@ -112,7 +108,7 @@ if (require.main === module) {
 				.filter(({ stderr }) => stderr)
 				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
 
-			process.exit(errors.find(({ code }) => code).code || 1);
+			process.exit((errors.find(({ code }) => code) || {}).code || 1);
 		});
 }
-export default (...args) => lint([process.argv[0], __filename, ...args]);
+export default lint;
