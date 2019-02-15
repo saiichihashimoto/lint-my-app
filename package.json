@@ -62,7 +62,7 @@
   "dependencies": {
     "commander": "2.19.0",
     "cosmiconfig": "5.0.7",
-    "eslint": "5.13.0",
+    "eslint": "5.14.0",
     "execa": "1.0.0",
     "fixjson": "1.1.0",
     "imagemin-lint-staged": "^0.4.0",
