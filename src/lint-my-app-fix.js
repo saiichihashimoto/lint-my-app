@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import Listr from 'listr';
 import execa from 'execa';
+import globby from 'globby';
 import path from 'path';
 import program from 'commander';
+import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 import availableConfigs from './available-configs';
 
-function fix({
+async function fix({
 	sortPackageJson = true,
 	eslint = true,
 	stylelint = true,
@@ -17,24 +19,10 @@ function fix({
 			{
 				title: 'sort-package-json',
 				skip:  () => !sortPackageJson,
-				task:  () => {
-					const gitLs = execa('git', ['ls-files']);
-					const grepPackageJson = execa('grep', ['package\\.json$']);
-
-					const packageJson = execa(
-						'xargs',
-						[
-							'-I{}',
-							'sort-package-json',
-							'{}',
-						],
-					);
-
-					gitLs.stdout.pipe(grepPackageJson.stdin);
-					grepPackageJson.stdout.pipe(packageJson.stdin);
-
-					return packageJson;
-				},
+				task:  async () => Promise.all(
+					(await globby('**/package.json', { gitignore: true, dot: true }))
+						.map((packageJson) => execa('sort-package-json', [packageJson])),
+				),
 			},
 			{
 				title: 'eslint --fix',
@@ -83,49 +71,18 @@ function fix({
 			{
 				title: 'fixjson',
 				skip:  () => !fixjson,
-				task:  () => {
-					const gitLs = execa('git', ['ls-files']);
-					const grepJson = execa('grep', ['\\.json$']);
-					const noPackage = execa('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-
-					const xargsFixJson = execa(
-						'xargs',
-						[
-							'-I{}',
-							'fixjson',
-							'--write',
-							'"{}"',
-						],
-					);
-
-					gitLs.stdout.pipe(grepJson.stdin);
-					grepJson.stdout.pipe(noPackage.stdin);
-					noPackage.stdout.pipe(xargsFixJson.stdin);
-
-					return xargsFixJson;
-				},
+				task:  async () => Promise.all(
+					(await globby('**/!(package).json', { gitignore: true }))
+						.map((jsonFile) => execa('fixjson', ['--write', jsonFile])),
+				),
 			},
 			{
 				title: 'imagemin',
 				skip:  () => !imagemin,
-				task:  () => {
-					const gitLs = execa('git', ['ls-files']);
-					const images = execa('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-
-					const xargsImagemin = execa(
-						'xargs',
-						[
-							'-I{}',
-							'imagemin-lint-staged',
-							'{}',
-						],
-					);
-
-					gitLs.stdout.pipe(images.stdin);
-					images.stdout.pipe(xargsImagemin.stdin);
-
-					return xargsImagemin;
-				},
+				task:  async () => Promise.all(
+					(await globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true }))
+						.map((image) => imageminLint(image)),
+				),
 			},
 		],
 		{
@@ -157,7 +114,7 @@ if (require.main === module) {
 				.filter(({ stderr }) => stderr)
 				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
 
-			process.exit((errors.find(({ code }) => code) || {}).code || 1);
+			process.exit(1);
 		});
 }
 export default fix;

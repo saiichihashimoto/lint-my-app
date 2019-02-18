@@ -1,14 +1,20 @@
 import execa from 'execa';
+import globby from 'globby';
 import path from 'path';
+import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 import availableConfigs from './available-configs';
 import fix from './lint-my-app-fix';
 
 jest.mock('execa');
+jest.mock('globby');
+jest.mock('imagemin-lint-staged/lib');
 
 describe('lint-my-app fix', () => {
 	const emptyJson = path.resolve(__dirname, 'empty.json');
 
 	beforeEach(() => {
+		globby.mockImplementation(() => Promise.resolve([]));
+		imageminLint.mockImplementation(() => Promise.resolve([]));
 		execa.mockImplementation(() => {
 			const promise = Promise.resolve();
 			promise.stdin = jest.fn();
@@ -22,19 +28,21 @@ describe('lint-my-app fix', () => {
 	});
 
 	describe('sort-package-json', () => {
+		beforeEach(() => {
+			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/package.json' ? ['package.json', 'folder/package.json'] : []));
+		});
+
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).toHaveBeenCalledWith('grep', ['package\\.json$']);
-			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
+			expect(execa).toHaveBeenCalledWith('sort-package-json', ['package.json']);
+			expect(execa).toHaveBeenCalledWith('sort-package-json', ['folder/package.json']);
 		});
 
 		it('can be disabled', async () => {
 			await fix({ sortPackageJson: false });
 
-			expect(execa).not.toHaveBeenCalledWith('grep', ['package\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'sort-package-json', '{}']);
+			expect(execa).not.toHaveBeenCalledWith('sort-package-json', expect.anything());
 		});
 	});
 
@@ -245,40 +253,40 @@ describe('lint-my-app fix', () => {
 	});
 
 	describe('fixjson', () => {
+		beforeEach(() => {
+			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/!(package).json' ? ['foo.json', 'folder/bar.json'] : []));
+		});
+
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
-			expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'fixjson', '--write', '"{}"']);
+			expect(execa).toHaveBeenCalledWith('fixjson', ['--write', 'foo.json']);
+			expect(execa).toHaveBeenCalledWith('fixjson', ['--write', 'folder/bar.json']);
 		});
 
 		it('can be disabled', async () => {
 			await fix({ fixjson: false });
 
-			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'fixjson', '--write', '"{}"']);
+			expect(execa).not.toHaveBeenCalledWith('fixjson', expect.anything());
 		});
 	});
 
 	describe('imagemin-lint-staged', () => {
+		beforeEach(() => {
+			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/*.{png,jpeg,jpg,gif,svg}' ? ['foo.png', 'folder/bar.svg'] : []));
+		});
+
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'imagemin-lint-staged', '{}']);
+			expect(imageminLint).toHaveBeenCalledWith('foo.png');
+			expect(imageminLint).toHaveBeenCalledWith('folder/bar.svg');
 		});
 
 		it('can be disabled', async () => {
 			await fix({ imagemin: false });
 
-			// expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.\\(png\\|jpeg\\|jpg\\|gif\\|svg\\)$']);
-			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'imagemin-lint-staged', '{}']);
+			expect(imageminLint).not.toHaveBeenCalled();
 		});
 	});
 });

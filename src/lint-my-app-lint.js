@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import Listr from 'listr';
 import execa from 'execa';
+import globby from 'globby';
 import path from 'path';
+import packageOk from 'pkg-ok';
 import program from 'commander';
 import availableConfigs from './available-configs';
 
@@ -11,7 +13,10 @@ function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true }
 			{
 				title: 'pkg-ok',
 				skip:  () => !pkgOk,
-				task:  () => execa('pkg-ok'),
+				task:  async () => Promise.all(
+					(await globby('**/package.json', { gitignore: true, dot: true }))
+						.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
+				),
 			},
 			{
 				title: 'eslint',
@@ -58,26 +63,10 @@ function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true }
 			{
 				title: 'jsonlint',
 				skip:  () => !jsonlint,
-				task:  () => {
-					const gitLs = execa('git', ['ls-files']);
-					const grepJson = execa('grep', ['\\.json$']);
-					const noPackage = execa('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-					const xargsJsonlint = execa(
-						'xargs',
-						[
-							'-I{}',
-							'jsonlint',
-							'--quiet',
-							'"{}"',
-						],
-					);
-
-					gitLs.stdout.pipe(grepJson.stdin);
-					grepJson.stdout.pipe(noPackage.stdin);
-					noPackage.stdout.pipe(xargsJsonlint.stdin);
-
-					return xargsJsonlint;
-				},
+				task:  async () => Promise.all(
+					(await globby('**/!(package).json', { gitignore: true }))
+						.map((jsonFile) => execa('jsonlint', ['--quiet', jsonFile])),
+				),
 			},
 		],
 		{
@@ -108,7 +97,7 @@ if (require.main === module) {
 				.filter(({ stderr }) => stderr)
 				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
 
-			process.exit((errors.find(({ code }) => code) || {}).code || 1);
+			process.exit(1);
 		});
 }
 export default lint;

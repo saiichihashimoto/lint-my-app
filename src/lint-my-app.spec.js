@@ -34,7 +34,7 @@ describe('lint-my-app', () => {
 		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-fix.js')], expect.anything());
 	});
 
-	it('`lint` spawns lint-my-app-staged', () => {
+	it('`staged` executes lint-staged', () => {
 		lintMyApp('staged');
 
 		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-staged.js')], expect.anything());

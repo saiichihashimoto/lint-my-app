@@ -1,14 +1,19 @@
 import execa from 'execa';
+import globby from 'globby';
 import path from 'path';
+import pkgOk from 'pkg-ok';
 import availableConfigs from './available-configs';
 import lint from './lint-my-app-lint';
 
 jest.mock('execa');
+jest.mock('globby');
+jest.mock('pkg-ok');
 
 describe('lint-my-app lint', () => {
 	const emptyJson = path.resolve(__dirname, 'empty.json');
 
 	beforeEach(() => {
+		globby.mockImplementation(() => Promise.resolve([]));
 		execa.mockImplementation(() => {
 			const promise = Promise.resolve();
 			promise.stdin = jest.fn();
@@ -22,16 +27,21 @@ describe('lint-my-app lint', () => {
 	});
 
 	describe('pkg-ok', () => {
+		beforeEach(() => {
+			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/package.json' ? ['package.json', 'folder/package.json'] : []));
+		});
+
 		it('executes', async () => {
 			await lint();
 
-			expect(execa).toHaveBeenCalledWith('pkg-ok');
+			expect(pkgOk).toHaveBeenCalledWith(process.cwd());
+			expect(pkgOk).toHaveBeenCalledWith(`${process.cwd()}/folder`);
 		});
 
 		it('can be disabled', async () => {
 			await lint({ pkgOk: false });
 
-			expect(execa).not.toHaveBeenCalledWith('pkg-ok');
+			expect(pkgOk).not.toHaveBeenCalled();
 		});
 	});
 
@@ -227,22 +237,21 @@ describe('lint-my-app lint', () => {
 	});
 
 	describe('jsonlint', () => {
+		beforeEach(() => {
+			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/!(package).json' ? ['foo.json', 'folder/bar.json'] : []));
+		});
+
 		it('executes', async () => {
 			await lint();
 
-			expect(execa).toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).toHaveBeenCalledWith('grep', ['\\.json$']);
-			expect(execa).toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).toHaveBeenCalledWith('xargs', ['-I{}', 'jsonlint', '--quiet', '"{}"']);
+			expect(execa).toHaveBeenCalledWith('jsonlint', ['--quiet', 'foo.json']);
+			expect(execa).toHaveBeenCalledWith('jsonlint', ['--quiet', 'folder/bar.json']);
 		});
 
 		it('can be disabled', async () => {
 			await lint({ jsonlint: false });
 
-			expect(execa).not.toHaveBeenCalledWith('git', ['ls-files']);
-			expect(execa).not.toHaveBeenCalledWith('grep', ['\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith('grep', ['-v', 'package\\(-lock\\)\\?\\.json$']);
-			expect(execa).not.toHaveBeenCalledWith('xargs', ['-I{}', 'jsonlint', '--quiet', '"{}"']);
+			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.anything());
 		});
 	});
 });

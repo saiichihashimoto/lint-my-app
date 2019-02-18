@@ -1,12 +1,12 @@
-import execa from 'execa';
+import lintStaged from 'lint-staged/src';
 import path from 'path';
 import staged from './lint-my-app-staged';
 
-jest.mock('execa');
+jest.mock('lint-staged/src');
 
 describe('lint-my-app staged', () => {
 	beforeEach(() => {
-		execa.mockImplementation(() => Promise.resolve());
+		lintStaged.mockImplementation(() => Promise.resolve());
 	});
 
 	afterEach(() => {
@@ -16,6 +16,6 @@ describe('lint-my-app staged', () => {
 	it('executes lint-staged', async () => {
 		await expect(staged()).resolves;
 
-		expect(execa).toHaveBeenCalledWith('lint-staged', ['--config', path.resolve(__dirname, 'lint-staged.config.js')], expect.anything());
+		expect(lintStaged).toHaveBeenCalledWith(console, path.resolve(__dirname, 'lint-staged.config.js'));
 	});
 });

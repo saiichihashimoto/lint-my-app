@@ -1,17 +1,9 @@
 #!/usr/bin/env node
-import execa from 'execa';
+import lintStaged from 'lint-staged/src';
 import path from 'path';
 
 function staged() {
-	return execa(
-		'lint-staged',
-		[
-			'--config', path.resolve(__dirname, 'lint-staged.config.js'),
-		],
-		{
-			stdio: [process.stdin, process.stdout, process.stderr],
-		},
-	);
+	return lintStaged(console, path.resolve(__dirname, 'lint-staged.config.js'));
 }
 
 /* istanbul ignore next line */

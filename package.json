@@ -40,7 +40,7 @@
     "lint": "npm run lint-my-app -- lint",
     "lint-my-app": "npm run build && ./lib/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
-    "test": "jest --verbose $(if [ -z \"$CI\" ]; then echo --watch; else echo --color --coverage; fi)"
+    "test": "jest --verbose $(if [ -z ${CI+x} ]; then echo --watch; else echo --color --coverage; fi)"
   },
   "husky": {
     "hooks": {
@@ -65,7 +65,8 @@
     "eslint": "5.14.0",
     "execa": "1.0.0",
     "fixjson": "1.1.0",
-    "imagemin-lint-staged": "^0.4.0",
+    "globby": "9.0.0",
+    "imagemin-lint-staged": "0.4.0",
     "jsonlint": "1.6.3",
     "lint-staged": "8.1.4",
     "listr": "0.14.3",
