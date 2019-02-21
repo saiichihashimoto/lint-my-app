@@ -7,23 +7,19 @@ import program from 'commander';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 import availableConfigs from './available-configs';
 
-async function fix({
+function fix({
 	sortPackageJson = true,
 	eslint = true,
 	stylelint = true,
 	fixjson = true,
 	imagemin = true,
 } = {}) {
+	const packageJsons = globby('**/package.json', { gitignore: true, dot: true });
+	const jsons = globby('**/!(package).json', { gitignore: true });
+	const images = globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true });
+
 	return new Listr(
 		[
-			{
-				title: 'sort-package-json',
-				skip:  () => !sortPackageJson,
-				task:  async () => Promise.all(
-					(await globby('**/package.json', { gitignore: true, dot: true }))
-						.map((packageJson) => execa('sort-package-json', [packageJson])),
-				),
-			},
 			{
 				title: 'eslint --fix',
 				skip:  () => !eslint,
@@ -40,15 +36,16 @@ async function fix({
 					].filter(Boolean),
 				),
 			},
-			{
-				title: 'stylelint --fix',
+			...[
+				['"**/*.css"'],
+				['"**/*.scss"', '--syntax=scss'],
+			].map((inputArgs) => ({
+				title: `stylelint --fix ${inputArgs[0]}`,
 				skip:  () => !stylelint,
 				task:  () => new Listr(
 					[
-						['"**/*.css"'],
-						['"**/*.css"', '--report-needless-disables'],
-						['"**/*.scss"', '--syntax=scss'],
-						['"**/*.scss"', '--syntax=scss', '--report-needless-disables'],
+						inputArgs,
+						[...inputArgs, '--report-needless-disables'],
 					].map((styleArgs) => ({
 						title: styleArgs.join(' '),
 						task:  () => execa(
@@ -67,20 +64,28 @@ async function fix({
 						exitOnError: false,
 					},
 				),
+			})),
+			{
+				title: 'sort-package-json',
+				skip:  async () => !sortPackageJson || !(await packageJsons).length,
+				task:  async () => Promise.all(
+					(await packageJsons)
+						.map((packageJson) => execa('sort-package-json', [packageJson])),
+				),
 			},
 			{
 				title: 'fixjson',
-				skip:  () => !fixjson,
+				skip:  async () => !fixjson || !(await jsons).length,
 				task:  async () => Promise.all(
-					(await globby('**/!(package).json', { gitignore: true }))
+					(await jsons)
 						.map((jsonFile) => execa('fixjson', ['--write', jsonFile])),
 				),
 			},
 			{
 				title: 'imagemin',
-				skip:  () => !imagemin,
+				skip:  async () => !imagemin || !(await images).length,
 				task:  async () => Promise.all(
-					(await globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true }))
+					(await images)
 						.map((image) => imageminLint(image)),
 				),
 			},

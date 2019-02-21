@@ -27,6 +27,60 @@ describe('lint-my-app fix', () => {
 		jest.resetAllMocks();
 	});
 
+	describe('eslint --fix', () => {
+		it('executes', async () => {
+			await fix();
+
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--fix', '.']));
+		});
+
+		it('can be disabled', async () => {
+			await fix({ eslint: false });
+
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+		});
+
+		it('defaults to empty.json config', async () => {
+			const valueBefore = availableConfigs.eslint;
+			availableConfigs.eslint = false;
+
+			await fix();
+
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--config', emptyJson]));
+
+			availableConfigs.eslint = valueBefore;
+		});
+	});
+
+	describe('stylelint --fix', () => {
+		it('executes', async () => {
+			const valueBefore = availableConfigs.stylelint;
+			availableConfigs.stylelint = true;
+
+			await fix();
+
+			// FIXME How do I check for all four combinations?
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.css"']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.scss"', '--syntax=scss']));
+
+			availableConfigs.stylelint = valueBefore;
+		});
+
+		it('can be disabled', async () => {
+			await fix({ stylelint: false });
+
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.anything());
+		});
+
+		it('defaults to empty.json config', async () => {
+			await fix();
+
+			// FIXME How do I check for all four combinations?
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '--config', emptyJson, '"**/*.css"']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '--config', emptyJson, '"**/*.scss"', '--syntax=scss']));
+		});
+	});
+
 	describe('sort-package-json', () => {
 		beforeEach(() => {
 			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/package.json' ? ['package.json', 'folder/package.json'] : []));
@@ -46,212 +100,6 @@ describe('lint-my-app fix', () => {
 		});
 	});
 
-	describe('eslint --fix', () => {
-		it('executes', async () => {
-			await fix();
-
-			expect(execa).toHaveBeenCalledWith(
-				'eslint',
-				[
-					'--ignore-path', '.gitignore',
-					'--ignore-pattern', '\'!.*.js\'',
-					'--color',
-					'--fix',
-					'--report-unused-disable-directives',
-					'.',
-				],
-			);
-		});
-
-		it('can be disabled', async () => {
-			await fix({ eslint: false });
-
-			expect(execa).not.toHaveBeenCalledWith(
-				'eslint',
-				[
-					'--ignore-path', '.gitignore',
-					'--ignore-pattern', '\'!.*.js\'',
-					'--color',
-					'--fix',
-					'--report-unused-disable-directives',
-					'.',
-				],
-			);
-		});
-
-		it('defaults to empty.json config', async () => {
-			const valueBefore = availableConfigs.eslint;
-			availableConfigs.eslint = false;
-
-			await fix();
-
-			expect(execa).toHaveBeenCalledWith(
-				'eslint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--ignore-pattern', '\'!.*.js\'',
-					'--color',
-					'--fix',
-					'--report-unused-disable-directives',
-					'.',
-				],
-			);
-
-			availableConfigs.eslint = valueBefore;
-		});
-	});
-
-	describe('stylelint --fix', () => {
-		it('executes', async () => {
-			await fix();
-
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-					'--report-needless-disables',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-					'--report-needless-disables',
-				],
-			);
-		});
-
-		it('can be disabled', async () => {
-			await fix({ stylelint: false });
-
-			expect(execa).not.toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-				],
-			);
-			expect(execa).not.toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-					'--report-needless-disables',
-				],
-			);
-			expect(execa).not.toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-				],
-			);
-			expect(execa).not.toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--config', emptyJson,
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-					'--report-needless-disables',
-				],
-			);
-		});
-
-		it('uses provided config', async () => {
-			const valueBefore = availableConfigs.stylelint;
-			availableConfigs.stylelint = true;
-
-			await fix();
-
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.css"',
-					'--report-needless-disables',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-				],
-			);
-			expect(execa).toHaveBeenCalledWith(
-				'stylelint',
-				[
-					'--ignore-path', '.gitignore',
-					'--color',
-					'--fix',
-					'"**/*.scss"',
-					'--syntax=scss',
-					'--report-needless-disables',
-				],
-			);
-
-			availableConfigs.stylelint = valueBefore;
-		});
-	});
-
 	describe('fixjson', () => {
 		beforeEach(() => {
 			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/!(package).json' ? ['foo.json', 'folder/bar.json'] : []));
@@ -260,8 +108,8 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('fixjson', ['--write', 'foo.json']);
-			expect(execa).toHaveBeenCalledWith('fixjson', ['--write', 'folder/bar.json']);
+			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['foo.json']));
+			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['folder/bar.json']));
 		});
 
 		it('can be disabled', async () => {

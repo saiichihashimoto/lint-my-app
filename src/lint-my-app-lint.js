@@ -8,16 +8,11 @@ import program from 'commander';
 import availableConfigs from './available-configs';
 
 function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true } = {}) {
+	const packageJsons = globby('**/package.json', { gitignore: true, dot: true });
+	const jsons = globby('**/!(package).json', { gitignore: true });
+
 	return new Listr(
 		[
-			{
-				title: 'pkg-ok',
-				skip:  () => !pkgOk,
-				task:  async () => Promise.all(
-					(await globby('**/package.json', { gitignore: true, dot: true }))
-						.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
-				),
-			},
 			{
 				title: 'eslint',
 				skip:  () => !eslint,
@@ -33,15 +28,16 @@ function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true }
 					].filter(Boolean),
 				),
 			},
-			{
-				title: 'stylelint',
+			...[
+				['"**/*.css"'],
+				['"**/*.scss"', '--syntax=scss'],
+			].map((inputArgs) => ({
+				title: `stylelint ${inputArgs[0]}`,
 				skip:  () => !stylelint,
 				task:  () => new Listr(
 					[
-						['"**/*.css"'],
-						['"**/*.css"', '--report-needless-disables'],
-						['"**/*.scss"', '--syntax=scss'],
-						['"**/*.scss"', '--syntax=scss', '--report-needless-disables'],
+						inputArgs,
+						[...inputArgs, '--report-needless-disables'],
 					].map((styleArgs) => ({
 						title: styleArgs.join(' '),
 						task:  () => execa(
@@ -59,12 +55,20 @@ function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true }
 						exitOnError: false,
 					},
 				),
+			})),
+			{
+				title: 'pkg-ok',
+				skip:  async () => !pkgOk || !(await packageJsons).length,
+				task:  async () => Promise.all(
+					(await packageJsons)
+						.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
+				),
 			},
 			{
 				title: 'jsonlint',
-				skip:  () => !jsonlint,
+				skip:  async () => !jsonlint || !(await jsons).length,
 				task:  async () => Promise.all(
-					(await globby('**/!(package).json', { gitignore: true }))
+					(await jsons)
 						.map((jsonFile) => execa('jsonlint', ['--quiet', jsonFile])),
 				),
 			},
