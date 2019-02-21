@@ -7,9 +7,12 @@ import packageOk from 'pkg-ok';
 import program from 'commander';
 import availableConfigs from './available-configs';
 
-function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true } = {}) {
-	const packageJsons = globby('**/package.json', { gitignore: true, dot: true });
-	const jsons = globby('**/!(package).json', { gitignore: true });
+async function lint({ eslint = true, stylelint = true, pkgOk = true, jsonlint = true } = {}) {
+	const packageJsons = pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [];
+	const jsons = jsonlint ? globby('**/!(package).json', { gitignore: true, dot: true }) : [];
+
+	const hasPackageJsons = (await packageJsons).length;
+	const hasJsons = (await jsons).length;
 
 	return new Listr(
 		[
@@ -28,46 +31,59 @@ function lint({ pkgOk = true, eslint = true, stylelint = true, jsonlint = true }
 					].filter(Boolean),
 				),
 			},
-			...[
-				['"**/*.css"'],
-				['"**/*.scss"', '--syntax=scss'],
-			].map((inputArgs) => ({
-				title: `stylelint ${inputArgs[0]}`,
+			{
+				title: 'stylelint',
 				skip:  () => !stylelint,
 				task:  () => new Listr(
 					[
-						inputArgs,
-						[...inputArgs, '--report-needless-disables'],
-					].map((styleArgs) => ({
-						title: styleArgs.join(' '),
-						task:  () => execa(
-							'stylelint',
+						['"**/*.css"'],
+						['"**/*.scss"', '--syntax=scss'],
+					].map((inputArgs) => ({
+						title: inputArgs[0],
+						task:  () => new Listr(
 							[
-								...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-								'--ignore-path', '.gitignore',
-								'--color',
-								...styleArgs,
-							].filter(Boolean),
+								inputArgs,
+								[...inputArgs, '--report-needless-disables'],
+							].map((styleArgs) => ({
+								title: styleArgs.join(' '),
+								task:  () => execa(
+									'stylelint',
+									[
+										...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+										'--ignore-path', '.gitignore',
+										'--color',
+										...styleArgs,
+									].filter(Boolean),
+								),
+							})),
+							{
+								renderer:    process.env.NODE_ENV === 'test' ? 'silent' : /* istanbul ignore next */ 'default',
+								exitOnError: false,
+								concurrent:  true,
+							},
 						),
 					})),
 					{
 						renderer:    process.env.NODE_ENV === 'test' ? 'silent' : /* istanbul ignore next */ 'default',
 						exitOnError: false,
+						concurrent:  true,
 					},
 				),
-			})),
+			},
 			{
-				title: 'pkg-ok',
-				skip:  async () => !pkgOk || !(await packageJsons).length,
-				task:  async () => Promise.all(
+				title:   'pkg-ok',
+				enabled: () => !pkgOk || hasPackageJsons,
+				skip:    () => !pkgOk || !hasPackageJsons,
+				task:    async () => Promise.all(
 					(await packageJsons)
 						.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
 				),
 			},
 			{
-				title: 'jsonlint',
-				skip:  async () => !jsonlint || !(await jsons).length,
-				task:  async () => Promise.all(
+				title:   'jsonlint',
+				enabled: () => !jsonlint || hasJsons,
+				skip:    () => !jsonlint || !hasJsons,
+				task:    async () => Promise.all(
 					(await jsons)
 						.map((jsonFile) => execa('jsonlint', ['--quiet', jsonFile])),
 				),
