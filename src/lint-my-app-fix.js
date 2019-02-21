@@ -110,7 +110,7 @@ if (require.main === module) {
 		.parse(process.argv);
 
 	fix(program)
-		.catch((err) => {
+		.catch((err) => { // eslint-disable-line promise/prefer-await-to-callbacks
 			const { errors = [] } = err;
 			errors
 				.filter(({ stdout }) => stdout)
