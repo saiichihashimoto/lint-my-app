@@ -65,7 +65,7 @@
     "eslint": "5.15.0",
     "execa": "1.0.0",
     "fixjson": "1.1.0",
-    "globby": "9.0.0",
+    "globby": "9.1.0",
     "imagemin-lint-staged": "0.4.0",
     "jsonlint": "1.6.3",
     "lint-staged": "8.1.5",
