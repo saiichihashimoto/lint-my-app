@@ -71,7 +71,7 @@
     "lint-staged": "8.1.5",
     "listr": "0.14.3",
     "pkg-ok": "2.3.1",
-    "sort-package-json": "1.20.0",
+    "sort-package-json": "1.21.0",
     "stylelint": "9.10.1"
   },
   "devDependencies": {
