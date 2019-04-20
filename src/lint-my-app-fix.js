@@ -61,6 +61,7 @@ async function fix({
 										...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 										'--ignore-path', '.gitignore',
 										'--color',
+										'--allow-empty-input',
 										'--fix',
 										...styleArgs,
 									].filter(Boolean),
