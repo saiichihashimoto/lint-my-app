@@ -7,13 +7,13 @@ module.exports = {
 		'git add',
 	],
 	'*.css': [
-		`stylelint --fix --color ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''}`,
-		`stylelint --fix --color ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''} --report-needless-disables`,
+		`stylelint --fix --color --allow-empty-input ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''}`,
+		`stylelint --fix --color --allow-empty-input ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''} --report-needless-disables`,
 		'git add',
 	],
 	'*.scss': [
-		`stylelint --syntax=scss --fix --color ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''}`,
-		`stylelint --syntax=scss --fix --color ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''} --report-needless-disables`,
+		`stylelint --syntax=scss --fix --color --allow-empty-input ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''}`,
+		`stylelint --syntax=scss --fix --color --allow-empty-input ${!availableConfigs.stylelint ? `--config ${__dirname}/bin/empty.json` : ''} --report-needless-disables`,
 		'git add',
 	],
 	'**/package.json': [

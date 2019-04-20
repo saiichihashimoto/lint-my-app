@@ -52,6 +52,7 @@ async function lint({ eslint = true, stylelint = true, pkgOk = true, jsonlint = 
 										...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 										'--ignore-path', '.gitignore',
 										'--color',
+										'--allow-empty-input',
 										...styleArgs,
 									].filter(Boolean),
 								),
