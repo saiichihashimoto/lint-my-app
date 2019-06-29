@@ -98,6 +98,14 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).not.toHaveBeenCalledWith('sort-package-json', expect.anything());
 		});
+
+		it('skipped without package.json', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
+
+			expect(execa).not.toHaveBeenCalledWith('sort-package-json', expect.anything());
+		});
 	});
 
 	describe('fixjson', () => {
@@ -117,6 +125,14 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).not.toHaveBeenCalledWith('fixjson', expect.anything());
 		});
+
+		it('skipped without json', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
+
+			expect(execa).not.toHaveBeenCalledWith('fixjson', expect.anything());
+		});
 	});
 
 	describe('imagemin-lint-staged', () => {
@@ -133,6 +149,14 @@ describe('lint-my-app fix', () => {
 
 		it('can be disabled', async () => {
 			await fix({ imagemin: false });
+
+			expect(imageminLint).not.toHaveBeenCalled();
+		});
+
+		it('skipped without images', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
 
 			expect(imageminLint).not.toHaveBeenCalled();
 		});

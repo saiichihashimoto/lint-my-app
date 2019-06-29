@@ -97,6 +97,14 @@ describe('lint-my-app lint', () => {
 
 			expect(pkgOk).not.toHaveBeenCalled();
 		});
+
+		it('skipped without package.json', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await lint();
+
+			expect(pkgOk).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('jsonlint', () => {
@@ -113,6 +121,14 @@ describe('lint-my-app lint', () => {
 
 		it('can be disabled', async () => {
 			await lint({ jsonlint: false });
+
+			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.anything());
+		});
+
+		it('skipped without json', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await lint();
 
 			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.anything());
 		});
