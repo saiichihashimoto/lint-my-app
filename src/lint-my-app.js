@@ -1,36 +1,31 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { version } from '../package';
-import lintMyAppFix from './lint-my-app-fix';
-import lintMyAppLint from './lint-my-app-lint';
-import lintMyAppStaged from './lint-my-app-staged';
+import lintMyAppFix, { cliArgs as fixArgs } from './lint-my-app-fix';
+import lintMyAppLint, { cliArgs as lintArgs } from './lint-my-app-lint';
+import lintMyAppStaged, { cliArgs as stagedArgs } from './lint-my-app-staged';
 
-function lintMyApp(args) {
+function lintMyApp(argv) {
 	const program = new Command()
 		.version(version);
 
-	program
-		.command('lint')
-		.option('--no-pkg-ok')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-jsonlint')
-		.action(lintMyAppLint);
+	let returnValue;
 
-	program
-		.command('fix')
-		.option('--no-sort-package-json')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-fixjson')
-		.option('--no-imagemin')
-		.action(lintMyAppFix);
+	lintArgs
+		.reduce((acc, arg) => acc.option(arg), program.command('lint'))
+		.action((args) => { returnValue = lintMyAppLint(args); });
 
-	program
-		.command('staged')
-		.action(lintMyAppStaged);
+	fixArgs
+		.reduce((acc, arg) => acc.option(arg), program.command('fix'))
+		.action((args) => { returnValue = lintMyAppFix(args); });
 
-	program.parse(args);
+	stagedArgs
+		.reduce((acc, arg) => acc.option(arg), program.command('staged'))
+		.action((args) => { returnValue = lintMyAppStaged(args); });
+
+	program.parse(argv);
+
+	return returnValue;
 }
 
 /* istanbul ignore next line */
@@ -38,4 +33,4 @@ if (require.main === module) {
 	lintMyApp(process.argv);
 }
 
-export default (...args) => lintMyApp([process.argv[0], __filename, ...args]);
+export default (...argv) => lintMyApp([process.argv[0], __filename, ...argv]);
