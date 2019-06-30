@@ -10,7 +10,7 @@ function lintMyApp(args) {
 		.version(version);
 
 	program
-		.command('lint', { isDefault: true })
+		.command('lint')
 		.option('--no-pkg-ok')
 		.option('--no-eslint')
 		.option('--no-stylelint')
