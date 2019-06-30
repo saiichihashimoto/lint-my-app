@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { version } from '../package';
-import lintMyAppFix, { cliArgs as fixArgs } from './lint-my-app-fix';
-import lintMyAppLint, { cliArgs as lintArgs } from './lint-my-app-lint';
-import lintMyAppStaged, { cliArgs as stagedArgs } from './lint-my-app-staged';
+import lintMyAppFix from './lint-my-app-fix';
+import lintMyAppLint from './lint-my-app-lint';
+import lintMyAppStaged from './lint-my-app-staged';
 import reportErrors from './report-errors';
 
 function lintMyApp(argv) {
@@ -12,16 +12,22 @@ function lintMyApp(argv) {
 
 	let returnValue;
 
-	lintArgs
-		.reduce((acc, arg) => acc.option(arg), program.command('lint'))
+	program.command('lint')
+		.option('--no-pkg-ok')
+		.option('--no-eslint')
+		.option('--no-stylelint')
+		.option('--no-jsonlint')
 		.action((args) => { returnValue = lintMyAppLint(args); });
 
-	fixArgs
-		.reduce((acc, arg) => acc.option(arg), program.command('fix'))
+	program.command('fix')
+		.option('--no-sort-package-json')
+		.option('--no-eslint')
+		.option('--no-stylelint')
+		.option('--no-fixjson')
+		.option('--no-imagemin')
 		.action((args) => { returnValue = lintMyAppFix(args); });
 
-	stagedArgs
-		.reduce((acc, arg) => acc.option(arg), program.command('staged'))
+	program.command('staged')
 		.action((args) => { returnValue = lintMyAppStaged(args); });
 
 	program.parse(argv);

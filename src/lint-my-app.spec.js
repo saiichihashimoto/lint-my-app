@@ -22,21 +22,82 @@ describe('lint-my-app', () => {
 		jest.resetAllMocks();
 	});
 
-	it('runs lint', () => {
-		lintMyApp('lint');
+	describe('lint', () => {
+		it('runs lint', () => {
+			lintMyApp('lint');
 
-		expect(lintMyAppLint).toHaveBeenCalledWith(expect.any(Object));
+			expect(lintMyAppLint).toHaveBeenCalledWith(expect.any(Object));
+		});
+
+		it('--no-pkg-ok', () => {
+			lintMyApp('lint', '--no-pkg-ok');
+
+			expect(lintMyAppLint).toHaveBeenCalledWith(expect.objectContaining({ pkgOk: false }));
+		});
+
+		it('--no-eslint', () => {
+			lintMyApp('lint', '--no-eslint');
+
+			expect(lintMyAppLint).toHaveBeenCalledWith(expect.objectContaining({ eslint: false }));
+		});
+
+		it('--no-stylelint', () => {
+			lintMyApp('lint', '--no-stylelint');
+
+			expect(lintMyAppLint).toHaveBeenCalledWith(expect.objectContaining({ stylelint: false }));
+		});
+
+		it('--no-jsonlint', () => {
+			lintMyApp('lint', '--no-jsonlint');
+
+			expect(lintMyAppLint).toHaveBeenCalledWith(expect.objectContaining({ jsonlint: false }));
+		});
 	});
 
-	it('runs fix', () => {
-		lintMyApp('fix');
+	describe('fix', () => {
+		it('runs fix', () => {
+			lintMyApp('fix');
 
-		expect(lintMyAppFix).toHaveBeenCalledWith(expect.any(Object));
+			expect(lintMyAppFix).toHaveBeenCalledWith(expect.any(Object));
+		});
+
+		it('--no-sort-package-json', () => {
+			lintMyApp('fix', '--no-sort-package-json');
+
+			expect(lintMyAppFix)
+				.toHaveBeenCalledWith(expect.objectContaining({ sortPackageJson: false }));
+		});
+
+		it('--no-eslint', () => {
+			lintMyApp('fix', '--no-eslint');
+
+			expect(lintMyAppFix).toHaveBeenCalledWith(expect.objectContaining({ eslint: false }));
+		});
+
+		it('--no-stylelint', () => {
+			lintMyApp('fix', '--no-stylelint');
+
+			expect(lintMyAppFix).toHaveBeenCalledWith(expect.objectContaining({ stylelint: false }));
+		});
+
+		it('--no-fixjson', () => {
+			lintMyApp('fix', '--no-fixjson');
+
+			expect(lintMyAppFix).toHaveBeenCalledWith(expect.objectContaining({ fixjson: false }));
+		});
+
+		it('--no-imagemin', () => {
+			lintMyApp('fix', '--no-imagemin');
+
+			expect(lintMyAppFix).toHaveBeenCalledWith(expect.objectContaining({ imagemin: false }));
+		});
 	});
 
-	it('runs staged', () => {
-		lintMyApp('staged');
+	describe('staged', () => {
+		it('runs staged', () => {
+			lintMyApp('staged');
 
-		expect(lintMyAppStaged).toHaveBeenCalledWith(expect.any(Object));
+			expect(lintMyAppStaged).toHaveBeenCalledWith(expect.any(Object));
+		});
 	});
 });

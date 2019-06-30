@@ -6,8 +6,6 @@ import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
-export const cliArgs = ['--no-sort-package-json', '--no-eslint', '--no-stylelint', '--no-fixjson', '--no-imagemin'];
-
 export default async function fix({
 	eslint = true,
 	stylelint = true,

@@ -6,8 +6,6 @@ import packageOk from 'pkg-ok';
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
-export const cliArgs = ['--no-pkg-ok', '--no-eslint', '--no-stylelint', '--no-jsonlint'];
-
 export default async function lint({
 	eslint = true,
 	stylelint = true,
