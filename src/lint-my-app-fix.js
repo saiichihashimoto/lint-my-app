@@ -76,7 +76,7 @@ export default async function fix({
 		{
 			title:   'sort-package-json',
 			enabled: () => !sortPackageJson || hasPackageJsons,
-			skip:    () => !sortPackageJson || !hasPackageJsons,
+			skip:    () => !sortPackageJson,
 			task:    async () => Promise.all(
 				(await packageJsons)
 					.map((packageJson) => execa('sort-package-json', [packageJson])),
@@ -85,7 +85,7 @@ export default async function fix({
 		{
 			title:   'fixjson',
 			enabled: () => !fixjson || hasJsons,
-			skip:    () => !fixjson || !hasJsons,
+			skip:    () => !fixjson,
 			task:    async () => Promise.all(
 				(await jsons)
 					.map((jsonFile) => execa('fixjson', ['--write', jsonFile])),
@@ -94,7 +94,7 @@ export default async function fix({
 		{
 			title:   'imagemin',
 			enabled: () => !imagemin || hasImages,
-			skip:    () => !imagemin || !hasImages,
+			skip:    () => !imagemin,
 			task:    async () => Promise.all(
 				(await images)
 					.map((image) => imageminLint(image)),

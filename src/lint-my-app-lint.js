@@ -65,7 +65,7 @@ export default async function lint({
 		{
 			title:   'pkg-ok',
 			enabled: () => !pkgOk || hasPackageJsons,
-			skip:    () => !pkgOk || !hasPackageJsons,
+			skip:    () => !pkgOk,
 			task:    async () => Promise.all(
 				(await packageJsons)
 					.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
@@ -74,7 +74,7 @@ export default async function lint({
 		{
 			title:   'jsonlint',
 			enabled: () => !jsonlint || hasJsons,
-			skip:    () => !jsonlint || !hasJsons,
+			skip:    () => !jsonlint,
 			task:    async () => Promise.all(
 				(await jsons)
 					.map((jsonFile) => execa('jsonlint', ['--quiet', jsonFile])),
