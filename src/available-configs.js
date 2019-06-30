@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import cosmiconfig from 'cosmiconfig';
 
 const cosmiconfigOptions = {

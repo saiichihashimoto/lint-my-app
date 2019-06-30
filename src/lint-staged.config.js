@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import availableConfigs from './available-configs';
 
 // Can't use "export default ..." with lint-staged
