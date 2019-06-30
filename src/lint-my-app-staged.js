@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import lintStaged from 'lint-staged/src';
 import path from 'path';
 

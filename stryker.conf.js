@@ -8,6 +8,7 @@ module.exports = (config) => {
 			// Would prefer these as a comment in the files, but that's not possible
 			'!src/available-configs.js',
 			'!src/lint-staged.config.js',
+			'!src/listr-defaults.js',
 		],
 		mutator:          'javascript',
 		packageManager:   'npm',
