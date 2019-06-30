@@ -9,6 +9,7 @@ module.exports = (config) => {
 			'!src/available-configs.js',
 			'!src/lint-staged.config.js',
 			'!src/listr-defaults.js',
+			'!src/report-errors.js',
 		],
 		mutator:          'javascript',
 		packageManager:   'npm',
