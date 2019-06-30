@@ -1,42 +1,42 @@
 import EventEmitter from 'events';
 import childProcess from 'child_process';
-import path from 'path';
 import lintMyApp from './lint-my-app';
+import lintMyAppFix from './lint-my-app-fix';
+import lintMyAppLint from './lint-my-app-lint';
+import lintMyAppStaged from './lint-my-app-staged';
 
 jest.mock('child_process');
+jest.mock('./lint-my-app-fix');
+jest.mock('./lint-my-app-lint');
+jest.mock('./lint-my-app-staged');
 
 describe('lint-my-app', () => {
-	const nodePath = process.argv[0];
-
 	beforeEach(() => {
 		childProcess.spawn.mockImplementation(() => new EventEmitter());
+		lintMyAppFix.mockImplementation(() => Promise.resolve());
+		lintMyAppLint.mockImplementation(() => Promise.resolve());
+		lintMyAppStaged.mockImplementation(() => Promise.resolve());
 	});
 
 	afterEach(() => {
 		jest.resetAllMocks();
 	});
 
-	it('spawns lint-my-app-lint', () => {
-		lintMyApp();
-
-		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-lint.js')], expect.anything());
-	});
-
-	it('`lint` spawns lint-my-app-lint', () => {
+	it('runs lint', () => {
 		lintMyApp('lint');
 
-		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-lint.js')], expect.anything());
+		expect(lintMyAppLint).toHaveBeenCalledWith(expect.any(Object));
 	});
 
-	it('`fix` spawns lint-my-app-fix', () => {
+	it('runs fix', () => {
 		lintMyApp('fix');
 
-		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-fix.js')], expect.anything());
+		expect(lintMyAppFix).toHaveBeenCalledWith(expect.any(Object));
 	});
 
-	it('`staged` executes lint-staged', () => {
+	it('runs staged', () => {
 		lintMyApp('staged');
 
-		expect(childProcess.spawn).toHaveBeenCalledWith(nodePath, [path.resolve(__dirname, 'lint-my-app-staged.js')], expect.anything());
+		expect(lintMyAppStaged).toHaveBeenCalledWith(expect.any(Object));
 	});
 });

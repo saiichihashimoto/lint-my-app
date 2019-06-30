@@ -4,10 +4,14 @@ import execa from 'execa';
 import globby from 'globby';
 import path from 'path';
 import packageOk from 'pkg-ok';
-import program from 'commander';
 import availableConfigs from './available-configs';
 
-async function lint({ eslint = true, stylelint = true, pkgOk = true, jsonlint = true } = {}) {
+export default async function lint({
+	eslint = true,
+	stylelint = true,
+	pkgOk = true,
+	jsonlint = true,
+} = {}) {
 	const packageJsons = pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [];
 	const jsons = jsonlint ? globby('**/!(package).json', { gitignore: true, dot: true }) : [];
 
@@ -99,26 +103,26 @@ async function lint({ eslint = true, stylelint = true, pkgOk = true, jsonlint = 
 		.run();
 }
 
-/* istanbul ignore next line */
-if (require.main === module) {
-	program
-		.option('--no-pkg-ok')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-jsonlint')
-		.parse(process.argv);
-
-	lint(program)
-		.catch((err) => { // eslint-disable-line promise/prefer-await-to-callbacks
-			const { errors = [] } = err;
-			errors
-				.filter(({ stdout }) => stdout)
-				.forEach(({ stdout }) => console.log(stdout)); // eslint-disable-line no-console
-			errors
-				.filter(({ stderr }) => stderr)
-				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
-
-			process.exit(1);
-		});
-}
-export default lint;
+/*
+ *if (require.main === module) {
+ *    program
+ *        .option('--no-pkg-ok')
+ *        .option('--no-eslint')
+ *        .option('--no-stylelint')
+ *        .option('--no-jsonlint')
+ *        .parse(process.argv);
+ *
+ *    lint(program)
+ *        .catch((err) => { // eslint-disable-line promise/prefer-await-to-callbacks
+ *            const { errors = [] } = err;
+ *            errors
+ *                .filter(({ stdout }) => stdout)
+ *                .forEach(({ stdout }) => console.log(stdout)); // eslint-disable-line no-console
+ *            errors
+ *                .filter(({ stderr }) => stderr)
+ *                .forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
+ *
+ *            process.exit(1);
+ *        });
+ *}
+ */

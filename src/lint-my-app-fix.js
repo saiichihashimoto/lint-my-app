@@ -3,11 +3,10 @@ import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
 import path from 'path';
-import program from 'commander';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 import availableConfigs from './available-configs';
 
-async function fix({
+export default async function fix({
 	eslint = true,
 	stylelint = true,
 	sortPackageJson = true,
@@ -118,26 +117,27 @@ async function fix({
 }
 
 /* istanbul ignore next line */
-if (require.main === module) {
-	program
-		.option('--no-sort-package-json')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-fixjson')
-		.option('--no-imagemin')
-		.parse(process.argv);
-
-	fix(program)
-		.catch((err) => { // eslint-disable-line promise/prefer-await-to-callbacks
-			const { errors = [] } = err;
-			errors
-				.filter(({ stdout }) => stdout)
-				.forEach(({ stdout }) => console.log(stdout)); // eslint-disable-line no-console
-			errors
-				.filter(({ stderr }) => stderr)
-				.forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
-
-			process.exit(1);
-		});
-}
-export default fix;
+/*
+ *if (require.main === module) {
+ *    program
+ *        .option('--no-sort-package-json')
+ *        .option('--no-eslint')
+ *        .option('--no-stylelint')
+ *        .option('--no-fixjson')
+ *        .option('--no-imagemin')
+ *        .parse(process.argv);
+ *
+ *    fix(program)
+ *        .catch((err) => { // eslint-disable-line promise/prefer-await-to-callbacks
+ *            const { errors = [] } = err;
+ *            errors
+ *                .filter(({ stdout }) => stdout)
+ *                .forEach(({ stdout }) => console.log(stdout)); // eslint-disable-line no-console
+ *            errors
+ *                .filter(({ stderr }) => stderr)
+ *                .forEach(({ stderr }) => console.error(stderr)); // eslint-disable-line no-console
+ *
+ *            process.exit(1);
+ *        });
+ *}
+ */
