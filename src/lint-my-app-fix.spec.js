@@ -31,6 +31,10 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--color']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--report-unused-disable-directives']));
 			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--fix', '.']));
 		});
 
@@ -60,6 +64,9 @@ describe('lint-my-app fix', () => {
 			await fix();
 
 			// FIXME How do I check for all four combinations?
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--color']));
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--allow-empty-input']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.css"']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.scss"', '--syntax=scss']));
 
@@ -83,7 +90,7 @@ describe('lint-my-app fix', () => {
 
 	describe('sort-package-json', () => {
 		beforeEach(() => {
-			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/package.json' ? ['package.json', 'folder/package.json'] : []));
+			globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/package.json' && gitignore && dot) ? ['package.json', 'folder/package.json'] : []));
 		});
 
 		it('executes', async () => {
@@ -98,18 +105,26 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).not.toHaveBeenCalledWith('sort-package-json', expect.anything());
 		});
+
+		it('skips without package.jsons', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
+
+			expect(execa).not.toHaveBeenCalledWith('sort-package-json', expect.anything());
+		});
 	});
 
 	describe('fixjson', () => {
 		beforeEach(() => {
-			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/!(package).json' ? ['foo.json', 'folder/bar.json'] : []));
+			globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
 		});
 
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['foo.json']));
-			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['folder/bar.json']));
+			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['--write', 'foo.json']));
+			expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['--write', 'folder/bar.json']));
 		});
 
 		it('can be disabled', async () => {
@@ -117,11 +132,19 @@ describe('lint-my-app fix', () => {
 
 			expect(execa).not.toHaveBeenCalledWith('fixjson', expect.anything());
 		});
+
+		it('skips without jsons', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
+
+			expect(execa).not.toHaveBeenCalledWith('fixjson', expect.anything());
+		});
 	});
 
 	describe('imagemin-lint-staged', () => {
 		beforeEach(() => {
-			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/*.{png,jpeg,jpg,gif,svg}' ? ['foo.png', 'folder/bar.svg'] : []));
+			globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.{png,jpeg,jpg,gif,svg}' && gitignore && dot) ? ['foo.png', 'folder/bar.svg'] : []));
 		});
 
 		it('executes', async () => {
@@ -133,6 +156,14 @@ describe('lint-my-app fix', () => {
 
 		it('can be disabled', async () => {
 			await fix({ imagemin: false });
+
+			expect(imageminLint).not.toHaveBeenCalled();
+		});
+
+		it('skips without images', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await fix();
 
 			expect(imageminLint).not.toHaveBeenCalled();
 		});

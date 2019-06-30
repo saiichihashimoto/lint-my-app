@@ -30,6 +30,10 @@ describe('lint-my-app lint', () => {
 		it('executes', async () => {
 			await lint();
 
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--color']));
+			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--report-unused-disable-directives']));
 			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['.']));
 		});
 
@@ -59,6 +63,9 @@ describe('lint-my-app lint', () => {
 			await lint();
 
 			// FIXME How do I check for all four combinations?
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--color']));
+			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--allow-empty-input']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.css"']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.scss"', '--syntax=scss']));
 
@@ -82,7 +89,7 @@ describe('lint-my-app lint', () => {
 
 	describe('pkg-ok', () => {
 		beforeEach(() => {
-			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/package.json' ? ['package.json', 'folder/package.json'] : []));
+			globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/package.json' && gitignore && dot) ? ['package.json', 'folder/package.json'] : []));
 		});
 
 		it('executes', async () => {
@@ -97,22 +104,39 @@ describe('lint-my-app lint', () => {
 
 			expect(pkgOk).not.toHaveBeenCalled();
 		});
+
+		it('skips without package.jsons', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await lint();
+
+			expect(pkgOk).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('jsonlint', () => {
 		beforeEach(() => {
-			globby.mockImplementation((pattern) => Promise.resolve(pattern === '**/!(package).json' ? ['foo.json', 'folder/bar.json'] : []));
+			globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
 		});
 
 		it('executes', async () => {
 			await lint();
 
+			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.not.arrayContaining(['--quiet']));
 			expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['foo.json']));
 			expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['folder/bar.json']));
 		});
 
 		it('can be disabled', async () => {
 			await lint({ jsonlint: false });
+
+			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.anything());
+		});
+
+		it('skips without jsons', async () => {
+			globby.mockImplementation(() => Promise.resolve([]));
+
+			await lint();
 
 			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.anything());
 		});
