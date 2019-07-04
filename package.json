@@ -40,8 +40,7 @@
     "lint": "npm run lint-my-app -- lint",
     "lint-my-app": "npm run build && ./lib/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
-    "test": "jest --verbose $(if [ -z ${CI+x} ]; then echo --watch; else echo --color --coverage; fi)",
-    "test:mutation": "stryker run"
+    "test": "jest --verbose $(if [ -z ${CI+x} ]; then echo --watch; else echo --color --coverage; fi)"
   },
   "husky": {
     "hooks": {
@@ -69,7 +68,7 @@
     "globby": "10.0.0",
     "imagemin-lint-staged": "0.4.0",
     "jsonlint": "1.6.3",
-    "lint-staged": "9.0.1",
+    "lint-staged": "9.0.2",
     "listr": "0.14.3",
     "pkg-ok": "2.3.1",
     "sort-package-json": "1.22.1",
@@ -82,7 +81,7 @@
     "@stryker-mutator/babel-transpiler": "2.0.0",
     "@stryker-mutator/core": "2.0.0",
     "@stryker-mutator/javascript-mutator": "2.0.1",
-    "@stryker-mutator/jest-runner": "2.0.0",
+    "@stryker-mutator/jest-runner": "2.0.1",
     "cz-conventional-changelog": "2.1.0",
     "eslint-config-saiichihashimoto": "1.2.38",
     "husky": "3.0.0",
