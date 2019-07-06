@@ -1,48 +1,55 @@
 #!/usr/bin/env node
+/* istanbul ignore file */
 import { Command } from 'commander';
 import { version } from '../package';
 import lintMyAppFix from './lint-my-app-fix';
 import lintMyAppLint from './lint-my-app-lint';
 import lintMyAppStaged from './lint-my-app-staged';
-import reportErrors from './report-errors';
 
-function lintMyApp(argv) {
-	const program = new Command()
-		.version(version);
+let action;
 
-	let returnValue;
+const program = new Command()
+	.version(version);
 
-	program.command('lint')
-		.option('--no-pkg-ok')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-jsonlint')
-		.action((args) => { returnValue = lintMyAppLint(args); });
+program.command('lint')
+	.option('--no-pkg-ok')
+	.option('--no-eslint')
+	.option('--no-stylelint')
+	.option('--no-jsonlint')
+	.action(() => { action = lintMyAppLint; });
 
-	program.command('fix')
-		.option('--no-sort-package-json')
-		.option('--no-eslint')
-		.option('--no-stylelint')
-		.option('--no-fixjson')
-		.option('--no-imagemin')
-		.action((args) => { returnValue = lintMyAppFix(args); });
+program.command('fix')
+	.option('--no-sort-package-json')
+	.option('--no-eslint')
+	.option('--no-stylelint')
+	.option('--no-fixjson')
+	.option('--no-imagemin')
+	.action(() => { action = lintMyAppFix; });
 
-	program.command('staged')
-		.action((args) => { returnValue = lintMyAppStaged(args); });
+program.command('staged')
+	.action(() => { action = lintMyAppStaged; });
 
-	program.parse(argv);
+program.parse(process.argv);
 
-	return returnValue;
-}
+action(program)
+	.catch((err) => { /* eslint-disable-line promise/prefer-await-to-callbacks */
+		const queue = [err];
 
-/* istanbul ignore next line */
-if (require.main === module) {
-	lintMyApp(process.argv)
-		.catch((err) => { /* eslint-disable-line promise/prefer-await-to-callbacks */
-			reportErrors(err);
+		while (queue.length) {
+			const currentErr = queue.shift();
 
-			process.exit(1);
-		});
-}
+			if (currentErr.errors) {
+				queue.push(...currentErr.errors);
+			} else if (currentErr.all) {
+				console.log(currentErr.all); /* eslint-disable-line no-console */
+			} else if (currentErr.stderr) {
+				console.error(currentErr.stderr); /* eslint-disable-line no-console */
+			} else if (currentErr.stdout) {
+				console.log(currentErr.stdout); /* eslint-disable-line no-console */
+			} else {
+				console.error(currentErr); /* eslint-disable-line no-console */
+			}
+		}
 
-export default (...argv) => lintMyApp([process.argv[0], __filename, ...argv]);
+		process.exit(1);
+	});

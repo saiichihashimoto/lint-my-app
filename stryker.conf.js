@@ -7,9 +7,9 @@ module.exports = (config) => {
 			'!{src,lib}/**/*+(Spec|Test).js?(x)',
 			// Would prefer these as a comment in the files, but that's not possible
 			'!src/available-configs.js',
+			'!src/lint-my-app.js',
 			'!src/lint-staged.config.js',
 			'!src/listr-defaults.js',
-			'!src/report-errors.js',
 		],
 		mutator:          'javascript',
 		packageManager:   'npm',
@@ -20,7 +20,7 @@ module.exports = (config) => {
 		thresholds:       {
 			high:  80,
 			low:   60,
-			break: 82.85,
+			break: 83.53,
 		},
 	});
 };
