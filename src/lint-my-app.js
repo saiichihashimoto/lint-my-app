@@ -46,7 +46,7 @@ action(program)
 				console.error(currentErr.stderr); /* eslint-disable-line no-console */
 			} else if (currentErr.stdout) {
 				console.log(currentErr.stdout); /* eslint-disable-line no-console */
-			} else {
+			} else if (currentErr.message !== 'Staged Failed') {
 				console.error(currentErr); /* eslint-disable-line no-console */
 			}
 		}
