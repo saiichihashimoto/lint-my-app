@@ -6,7 +6,7 @@ jest.mock('lint-staged/src');
 
 describe('lint-my-app staged', () => {
 	beforeEach(() => {
-		lintStaged.mockImplementation(() => Promise.resolve());
+		lintStaged.mockImplementation(() => Promise.resolve(true));
 	});
 
 	afterEach(() => {
@@ -17,5 +17,13 @@ describe('lint-my-app staged', () => {
 		await expect(staged()).resolves;
 
 		expect(lintStaged).toHaveBeenCalledWith(expect.objectContaining({ configPath: path.resolve(__dirname, 'lint-staged.config.js') }));
+	});
+
+	it('resolves', () => expect(staged()).resolves.toBe(true));
+
+	it('rejects if staged fails', () => {
+		lintStaged.mockImplementation(() => Promise.resolve(false));
+
+		return expect(staged()).rejects.toThrow('Staged Failed');
 	});
 });
