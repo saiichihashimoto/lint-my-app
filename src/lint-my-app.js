@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 /* istanbul ignore file */
+import updateNotifier from 'update-notifier';
 import { Command } from 'commander';
-import { version } from '../package';
+
 import lintMyAppFix from './lint-my-app-fix';
 import lintMyAppLint from './lint-my-app-lint';
 import lintMyAppStaged from './lint-my-app-staged';
+import pkg from '../package';
+
+updateNotifier({ pkg }).notify();
 
 let action;
 
 const program = new Command()
-	.version(version);
+	.version(pkg.version);
 
 program.command('lint')
 	.option('--no-pkg-ok')
