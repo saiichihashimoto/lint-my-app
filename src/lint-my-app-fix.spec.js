@@ -31,10 +31,10 @@ describe('lint-my-app fix', () => {
 		it('executes', async () => {
 			await fix();
 
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--color']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--report-unused-disable-directives']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
 			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--fix', '.']));
 		});
 
@@ -64,9 +64,9 @@ describe('lint-my-app fix', () => {
 			await fix();
 
 			// FIXME How do I check for all four combinations?
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--color']));
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--allow-empty-input']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.css"']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix', '"**/*.scss"', '--syntax=scss']));
 

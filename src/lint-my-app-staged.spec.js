@@ -24,6 +24,6 @@ describe('lint-my-app staged', () => {
 	it('rejects if staged fails', () => {
 		lintStaged.mockImplementation(() => Promise.resolve(false));
 
-		return expect(staged()).rejects.toThrow('Staged Failed');
+		return expect(staged()).rejects.toThrow('lint-staged failed');
 	});
 });

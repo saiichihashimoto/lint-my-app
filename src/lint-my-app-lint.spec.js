@@ -30,10 +30,10 @@ describe('lint-my-app lint', () => {
 		it('executes', async () => {
 			await lint();
 
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--color']));
-			expect(execa).not.toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--report-unused-disable-directives']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
+			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
 			expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['.']));
 		});
 
@@ -63,9 +63,9 @@ describe('lint-my-app lint', () => {
 			await lint();
 
 			// FIXME How do I check for all four combinations?
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--ignore-path', '.gitignore']));
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--color']));
-			expect(execa).not.toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--allow-empty-input']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--ignore-path', '.gitignore']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
+			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.css"']));
 			expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.scss"', '--syntax=scss']));
 
@@ -122,7 +122,7 @@ describe('lint-my-app lint', () => {
 		it('executes', async () => {
 			await lint();
 
-			expect(execa).not.toHaveBeenCalledWith('jsonlint', expect.not.arrayContaining(['--quiet']));
+			expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['--quiet']));
 			expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['foo.json']));
 			expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['folder/bar.json']));
 		});
