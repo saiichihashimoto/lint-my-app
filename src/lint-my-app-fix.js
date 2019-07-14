@@ -13,90 +13,77 @@ export default async function fix({
 	fixjson = true,
 	imagemin = true,
 } = {}) {
-	const packageJsons = sortPackageJson ? globby('**/package.json', { gitignore: true, dot: true }) : [];
-	const jsons = fixjson ? globby('**/!(package).json', { gitignore: true, dot: true }) : [];
-	const images = imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true, dot: true }) : [];
-
-	const hasPackageJsons = (await packageJsons).length;
-	const hasJsons = (await jsons).length;
-	const hasImages = (await images).length;
+	const [
+		jses,
+		csses,
+		scsses,
+		packageJsons,
+		jsons,
+		images,
+	] = await Promise.all([
+		eslint ? globby('**/*.js', { gitignore: true, dot: true }) : [],
+		stylelint ? globby('**/*.css', { gitignore: true, dot: true }) : [],
+		stylelint ? globby('**/*.scss', { gitignore: true, dot: true }) : [],
+		sortPackageJson ? globby('**/package.json', { gitignore: true, dot: true }) : [],
+		fixjson ? globby('**/!(package|package-lock).json', { gitignore: true, dot: true }) : [],
+		imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true, dot: true }) : [],
+	]);
 
 	return new Listr([
 		{
-			title: 'eslint --fix',
-			skip:  () => !eslint,
-			task:  () => execa(
-				'eslint',
-				[
-					...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-					'--ignore-path', '.gitignore',
-					'--ignore-pattern', '\'!.*.js\'',
+			title:   'eslint --fix',
+			enabled: () => !eslint || jses.length,
+			skip:    () => !eslint,
+			task:    () => execa('eslint', [
+				...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+				'--color',
+				'--report-unused-disable-directives',
+				'--fix',
+				...jses,
+			].filter(Boolean)),
+		},
+		...[
+			{ files: csses, args: [] },
+			{ files: scsses, args: ['--syntax=scss'] },
+		].map(({ files, args }) => ({
+			title:   ['stylelint', '--fix', ...args].join(' '),
+			enabled: () => !stylelint || files.length,
+			skip:    () => !stylelint,
+			task:    () => new Listr([
+				args,
+				[...args, '--report-needless-disables'],
+			].map((styleArgs) => ({
+				title: styleArgs.join(' '),
+				task:  () => execa('stylelint', [
+					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 					'--color',
+					'--allow-empty-input',
 					'--fix',
-					'--report-unused-disable-directives',
-					'.',
-				].filter(Boolean),
-			),
-		},
-		{
-			title: 'stylelint --fix',
-			skip:  () => !stylelint,
-			task:  () => new Listr([
-				['"**/*.css"'],
-				['"**/*.scss"', '--syntax=scss'],
-			].map((inputArgs) => ({
-				title: inputArgs[0],
-				task:  () => new Listr(
-					[
-						inputArgs,
-						[...inputArgs, '--report-needless-disables'],
-					].map((styleArgs) => ({
-						title: styleArgs.join(' '),
-						task:  () => execa(
-							'stylelint',
-							[
-								...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-								'--ignore-path', '.gitignore',
-								'--color',
-								'--allow-empty-input',
-								'--fix',
-								...styleArgs,
-							].filter(Boolean),
-						),
-					})),
-					{
-						...listrDefaults,
-						concurrent: false,
-					},
-				),
-			})), listrDefaults),
-		},
+					...styleArgs,
+					...files,
+				].filter(Boolean)),
+			})), {
+				...listrDefaults,
+				concurrent: false,
+			}),
+		})),
 		{
 			title:   'sort-package-json',
-			enabled: () => !sortPackageJson || hasPackageJsons,
+			enabled: () => !sortPackageJson || packageJsons.length,
 			skip:    () => !sortPackageJson,
-			task:    async () => Promise.all(
-				(await packageJsons)
-					.map((packageJson) => execa('sort-package-json', [packageJson])),
-			),
+			task:    () => Promise.all(packageJsons.map((packageJson) => execa('sort-package-json', [packageJson]))),
 		},
 		{
 			title:   'fixjson',
-			enabled: () => !fixjson || hasJsons,
+			enabled: () => !fixjson || jsons.length,
 			skip:    () => !fixjson,
-			task:    async () => Promise.all(
-				(await jsons)
-					.map((jsonFile) => execa('fixjson', ['--write', jsonFile])),
-			),
+			task:    () => Promise.all(jsons.map((jsonFile) => execa('fixjson', ['--write', jsonFile]))),
 		},
 		{
 			title:   'imagemin',
-			enabled: () => !imagemin || hasImages,
+			enabled: () => !imagemin || images.length,
 			skip:    () => !imagemin,
-			task:    async () => Promise.all(
-				(await images)
-					.map((image) => imageminLint(image)),
-			),
+			task:    () => Promise.all(images.map((image) => imageminLint(image))),
 		},
 	], listrDefaults)
 		.run();

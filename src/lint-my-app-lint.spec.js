@@ -184,7 +184,7 @@ describe('pkg-ok', () => {
 
 describe('jsonlint', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package|package-lock).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
 	});
 
 	it('executes', async () => {
