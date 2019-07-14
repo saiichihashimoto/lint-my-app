@@ -26,20 +26,18 @@ afterEach(() => {
 });
 
 describe('eslint', () => {
+	beforeEach(() => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.js' && gitignore && dot) ? ['foo.js', 'folder/bar.js'] : []));
+	});
+
 	it('executes', async () => {
 		await lint();
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-path', '.gitignore']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*.js\'']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['.']));
-	});
-
-	it('can be disabled', async () => {
-		await lint({ eslint: false });
-
-		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
+		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -52,9 +50,27 @@ describe('eslint', () => {
 
 		availableConfigs.eslint = valueBefore;
 	});
+
+	it('can be disabled', async () => {
+		await lint({ eslint: false });
+
+		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+	});
+
+	it('skips without jses', async () => {
+		globby.mockImplementation(() => Promise.resolve([]));
+
+		await lint();
+
+		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+	});
 });
 
 describe('stylelint', () => {
+	beforeEach(() => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.css' && gitignore && dot) ? ['foo.css', 'folder/bar.css'] : []));
+	});
+
 	it('executes', async () => {
 		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
@@ -62,27 +78,80 @@ describe('stylelint', () => {
 		await lint();
 
 		// FIXME How do I check for all four combinations?
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--ignore-path', '.gitignore']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.css"']));
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['"**/*.scss"', '--syntax=scss']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
+		expect(execa).toHaveBeenCalledTimes(2);
 
 		availableConfigs.stylelint = valueBefore;
-	});
-
-	it('can be disabled', async () => {
-		await lint({ stylelint: false });
-
-		expect(execa).not.toHaveBeenCalledWith('stylelint', expect.anything());
 	});
 
 	it('defaults to empty.json config', async () => {
 		await lint();
 
 		// FIXME How do I check for all four combinations?
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson, '"**/*.css"']));
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson, '"**/*.scss"', '--syntax=scss']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson]));
+	});
+
+	it('can be disabled', async () => {
+		await lint({ stylelint: false });
+
+		expect(execa).not.toHaveBeenCalledWith('stylelint', expect.arrayContaining([]));
+	});
+
+	it('skips without csses', async () => {
+		globby.mockImplementation(() => Promise.resolve([]));
+
+		await lint();
+
+		expect(execa).not.toHaveBeenCalledWith('stylelint', expect.arrayContaining([]));
+	});
+});
+
+describe('stylelint --syntax=scss', () => {
+	beforeEach(() => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.scss' && gitignore && dot) ? ['foo.scss', 'folder/bar.scss'] : []));
+	});
+
+	it('executes', async () => {
+		const valueBefore = availableConfigs.stylelint;
+		availableConfigs.stylelint = true;
+
+		await lint();
+
+		// FIXME How do I check for all four combinations?
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--syntax=scss']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
+		expect(execa).toHaveBeenCalledTimes(2);
+
+		availableConfigs.stylelint = valueBefore;
+	});
+
+	it('defaults to empty.json config', async () => {
+		await lint();
+
+		// FIXME How do I check for all four combinations?
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson, '--syntax=scss']));
+	});
+
+	it('can be disabled', async () => {
+		await lint({ stylelint: false });
+
+		expect(execa).not.toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--syntax=scss']));
+	});
+
+	it('skips without scsses', async () => {
+		globby.mockImplementation(() => Promise.resolve([]));
+
+		await lint();
+
+		expect(execa).not.toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--syntax=scss']));
 	});
 });
 

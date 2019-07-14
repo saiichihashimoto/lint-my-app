@@ -12,57 +12,62 @@ export default async function lint({
 	pkgOk = true,
 	jsonlint = true,
 } = {}) {
-	const packageJsons = pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [];
-	const jsons = jsonlint ? globby('**/!(package).json', { gitignore: true, dot: true }) : [];
-
-	const hasPackageJsons = (await packageJsons).length;
-	const hasJsons = (await jsons).length;
+	const [
+		jses,
+		csses,
+		scsses,
+		packageJsons,
+		jsons,
+	] = await Promise.all([
+		eslint ? globby('**/*.js', { gitignore: true, dot: true }) : [],
+		stylelint ? globby('**/*.css', { gitignore: true, dot: true }) : [],
+		stylelint ? globby('**/*.scss', { gitignore: true, dot: true }) : [],
+		pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [],
+		jsonlint ? globby('**/!(package).json', { gitignore: true, dot: true }) : [],
+	]);
 
 	return new Listr([
 		{
-			title: 'eslint',
-			skip:  () => !eslint,
-			task:  () => execa(
+			title:   'eslint',
+			enabled: () => !eslint || jses.length,
+			skip:    () => !eslint,
+			task:    () => execa(
 				'eslint',
 				[
 					...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-					'--ignore-path', '.gitignore',
-					'--ignore-pattern', '\'!.*.js\'',
 					'--color',
 					'--report-unused-disable-directives',
-					'.',
+					...jses,
 				].filter(Boolean),
 			),
 		},
-		{
-			title: 'stylelint',
-			skip:  () => !stylelint,
-			task:  () => new Listr([
-				['"**/*.css"'],
-				['"**/*.scss"', '--syntax=scss'],
-			].map((inputArgs) => ({
-				title: inputArgs[0],
-				task:  () => new Listr([
-					inputArgs,
-					[...inputArgs, '--report-needless-disables'],
-				].map((styleArgs) => ({
-					title: styleArgs.join(' '),
-					task:  () => execa(
-						'stylelint',
-						[
-							...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
-							'--ignore-path', '.gitignore',
-							'--color',
-							'--allow-empty-input',
-							...styleArgs,
-						].filter(Boolean),
-					),
-				})), listrDefaults),
+		...[
+			{ files: csses },
+			{ files: scsses, args: ['--syntax=scss'] },
+		].map(({ files, args = [] }) => ({
+			title:   ['stylelint', ...args].join(' '),
+			enabled: () => !stylelint || files.length,
+			skip:    () => !stylelint,
+			task:    () => new Listr([
+				args,
+				[...args, '--report-needless-disables'],
+			].map((styleArgs) => ({
+				title: styleArgs.join(' '),
+				task:  () => execa(
+					'stylelint',
+					[
+						...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+						'--color',
+						'--allow-empty-input',
+						...styleArgs,
+						...files,
+					].filter(Boolean),
+				),
 			})), listrDefaults),
-		},
+		})),
 		{
 			title:   'pkg-ok',
-			enabled: () => !pkgOk || hasPackageJsons,
+			enabled: () => !pkgOk || packageJsons.length,
 			skip:    () => !pkgOk,
 			task:    async () => Promise.all(
 				(await packageJsons)
@@ -71,7 +76,7 @@ export default async function lint({
 		},
 		{
 			title:   'jsonlint',
-			enabled: () => !jsonlint || hasJsons,
+			enabled: () => !jsonlint || jsons.length,
 			skip:    () => !jsonlint,
 			task:    async () => Promise.all(
 				(await jsons)
