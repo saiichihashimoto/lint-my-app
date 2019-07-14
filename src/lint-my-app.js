@@ -15,14 +15,16 @@ let action;
 const program = new Command()
 	.version(pkg.version);
 
-program.command('lint')
+program
+	.command('lint')
 	.option('--no-pkg-ok')
 	.option('--no-eslint')
 	.option('--no-stylelint')
 	.option('--no-jsonlint')
 	.action(() => { action = lintMyAppLint; });
 
-program.command('fix')
+program
+	.command('fix')
 	.option('--no-sort-package-json')
 	.option('--no-eslint')
 	.option('--no-stylelint')
@@ -30,7 +32,8 @@ program.command('fix')
 	.option('--no-imagemin')
 	.action(() => { action = lintMyAppFix; });
 
-program.command('staged')
+program
+	.command('staged')
 	.action(() => { action = lintMyAppStaged; });
 
 program.parse(process.argv);
