@@ -53,7 +53,7 @@ export default async function fix({
 				args,
 				[...args, '--report-needless-disables'],
 			].map((styleArgs) => ({
-				title: styleArgs.join(' '),
+				title: ['stylelint', '--fix', ...styleArgs].join(' '),
 				task:  () => execa('stylelint', [
 					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 					'--color',
