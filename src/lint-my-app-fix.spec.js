@@ -68,7 +68,7 @@ describe('eslint --fix', () => {
 	});
 });
 
-describe('stylelint', () => {
+describe('stylelint --fix', () => {
 	beforeEach(() => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.css' && gitignore && dot) ? ['foo.css', 'folder/bar.css'] : []));
 	});
@@ -113,7 +113,7 @@ describe('stylelint', () => {
 	});
 });
 
-describe('stylelint --syntax=scss', () => {
+describe('stylelint --fix --syntax=scss', () => {
 	beforeEach(() => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.scss' && gitignore && dot) ? ['foo.scss', 'folder/bar.scss'] : []));
 	});

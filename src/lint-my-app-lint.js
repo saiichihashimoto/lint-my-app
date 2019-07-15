@@ -49,7 +49,7 @@ export default async function lint({
 				args,
 				[...args, '--report-needless-disables'],
 			].map((styleArgs) => ({
-				title: styleArgs.join(' '),
+				title: ['stylelint', ...styleArgs].join(' '),
 				task:  () => execa('stylelint', [
 					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
 					'--color',
