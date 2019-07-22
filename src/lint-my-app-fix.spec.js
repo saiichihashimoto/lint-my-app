@@ -72,6 +72,38 @@ describe('eslint --fix', () => {
 
 		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
 	});
+
+	it('adds negated ignore-pattern for dotfiles', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['.foo.js'] : []));
+
+		await fix();
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledTimes(1);
+	});
+
+	it('adds negated ignore-pattern for dotfiles in a folder', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['folder/.foo.js'] : []));
+
+		await fix();
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledTimes(1);
+	});
+
+	it('ignores dotfiles', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => {
+			if (pattern !== '**/*.js' || !gitignore) {
+				return Promise.resolve([]);
+			}
+
+			return Promise.resolve(dot ? ['.foo.js', 'bar.js'] : ['bar.js']);
+		});
+
+		await fix({ dot: false });
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+	});
 });
 
 describe('stylelint --fix', () => {

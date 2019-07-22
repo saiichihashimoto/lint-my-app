@@ -23,6 +23,7 @@ program
 	.option('--no-eslint')
 	.option('--no-stylelint')
 	.option('--no-jsonlint')
+	.option('--no-dot')
 	.action(() => { action = lintMyAppLint; });
 
 program
@@ -32,6 +33,7 @@ program
 	.option('--no-stylelint')
 	.option('--no-fixjson')
 	.option('--no-imagemin')
+	.option('--no-dot')
 	.action(() => { action = lintMyAppFix; });
 
 program

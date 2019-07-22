@@ -13,6 +13,7 @@ export default async function lint({
 	stylelint = true,
 	pkgOk = true,
 	jsonlint = true,
+	dot = true,
 } = {}) {
 	const [
 		jses,
@@ -21,11 +22,11 @@ export default async function lint({
 		packageJsons,
 		jsons,
 	] = await Promise.all([
-		eslint ? globby('**/*.js', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.css', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.scss', { gitignore: true, dot: true }) : [],
-		pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [],
-		jsonlint ? globby('**/!(package|package-lock).json', { gitignore: true, dot: true }) : [],
+		eslint ? globby('**/*.js', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.css', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.scss', { dot, gitignore: true }) : [],
+		pkgOk ? globby('**/package.json', { dot, gitignore: true }) : [],
+		jsonlint ? globby('**/!(package|package-lock).json', { dot, gitignore: true }) : [],
 	]);
 
 	return new Listr([
@@ -35,6 +36,7 @@ export default async function lint({
 			skip:    () => !eslint,
 			task:    () => execa('eslint', [
 				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '\'!.*\''] : [],
 				'--color',
 				'--report-unused-disable-directives',
 				...jses,
