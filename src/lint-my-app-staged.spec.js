@@ -1,5 +1,7 @@
-import lintStaged from 'lint-staged/src';
 import path from 'path';
+
+import lintStaged from 'lint-staged/src';
+
 import staged from './lint-my-app-staged';
 
 jest.mock('lint-staged/src');
@@ -20,8 +22,8 @@ it('executes lint-staged', async () => {
 
 it('resolves', () => expect(staged()).resolves.toBe(true));
 
-it('rejects if staged fails', () => {
+it('rejects if staged fails', async () => {
 	lintStaged.mockImplementation(() => Promise.resolve(false));
 
-	return expect(staged()).rejects.toThrow('lint-staged failed');
+	await expect(staged()).rejects.toThrow('lint-staged failed');
 });

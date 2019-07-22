@@ -1,8 +1,10 @@
+import path from 'path';
+
 import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
-import path from 'path';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
+
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
@@ -35,7 +37,7 @@ export default async function fix({
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
 			task:    () => execa('eslint', [
-				...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 				'--color',
 				'--report-unused-disable-directives',
 				'--fix',
@@ -55,7 +57,7 @@ export default async function fix({
 			].map((styleArgs) => ({
 				title: ['stylelint', '--fix', ...styleArgs].join(' '),
 				task:  () => execa('stylelint', [
-					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+					...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 					'--color',
 					'--allow-empty-input',
 					'--fix',

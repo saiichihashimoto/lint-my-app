@@ -1,7 +1,9 @@
+import path from 'path';
+
 import execa from 'execa';
 import globby from 'globby';
-import path from 'path';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
+
 import availableConfigs from './available-configs';
 import fix from './lint-my-app-fix';
 
@@ -18,6 +20,7 @@ beforeEach(() => {
 		const promise = Promise.resolve();
 		promise.stdin = jest.fn();
 		promise.stdout = { pipe: jest.fn() };
+
 		return promise;
 	});
 });
@@ -27,8 +30,14 @@ afterEach(() => {
 });
 
 describe('eslint --fix', () => {
+	const configBefore = availableConfigs.eslint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.js' && gitignore && dot) ? ['foo.js', 'folder/bar.js'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['foo.js', 'folder/bar.js'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.eslint = configBefore;
 	});
 
 	it('executes', async () => {
@@ -43,14 +52,11 @@ describe('eslint --fix', () => {
 	});
 
 	it('defaults to empty.json config', async () => {
-		const valueBefore = availableConfigs.eslint;
 		availableConfigs.eslint = false;
 
 		await fix();
 
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--config', emptyJson]));
-
-		availableConfigs.eslint = valueBefore;
 	});
 
 	it('can be disabled', async () => {
@@ -69,12 +75,17 @@ describe('eslint --fix', () => {
 });
 
 describe('stylelint --fix', () => {
+	const configBefore = availableConfigs.stylelint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.css' && gitignore && dot) ? ['foo.css', 'folder/bar.css'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.css' && gitignore && dot ? ['foo.css', 'folder/bar.css'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.stylelint = configBefore;
 	});
 
 	it('executes', async () => {
-		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 
 		await fix();
@@ -87,8 +98,6 @@ describe('stylelint --fix', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
 		expect(execa).toHaveBeenCalledTimes(2);
-
-		availableConfigs.stylelint = valueBefore;
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -114,12 +123,17 @@ describe('stylelint --fix', () => {
 });
 
 describe('stylelint --fix --syntax=scss', () => {
+	const configBefore = availableConfigs.stylelint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.scss' && gitignore && dot) ? ['foo.scss', 'folder/bar.scss'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.scss' && gitignore && dot ? ['foo.scss', 'folder/bar.scss'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.stylelint = configBefore;
 	});
 
 	it('executes', async () => {
-		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 
 		await fix();
@@ -133,8 +147,6 @@ describe('stylelint --fix --syntax=scss', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
 		expect(execa).toHaveBeenCalledTimes(2);
-
-		availableConfigs.stylelint = valueBefore;
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -161,7 +173,7 @@ describe('stylelint --fix --syntax=scss', () => {
 
 describe('sort-package-json', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/package.json' && gitignore && dot) ? ['package.json', 'folder/package.json'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/package.json' && gitignore && dot ? ['package.json', 'folder/package.json'] : []));
 	});
 
 	it('executes', async () => {
@@ -188,7 +200,7 @@ describe('sort-package-json', () => {
 
 describe('fixjson', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package|package-lock).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/!(package|package-lock).json' && gitignore && dot ? ['foo.json', 'folder/bar.json'] : []));
 	});
 
 	it('executes', async () => {
@@ -215,7 +227,7 @@ describe('fixjson', () => {
 
 describe('imagemin-lint-staged', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.{png,jpeg,jpg,gif,svg}' && gitignore && dot) ? ['foo.png', 'folder/bar.svg'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.{png,jpeg,jpg,gif,svg}' && gitignore && dot ? ['foo.png', 'folder/bar.svg'] : []));
 	});
 
 	it('executes', async () => {

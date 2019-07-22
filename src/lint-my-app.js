@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /* istanbul ignore file */
+/* eslint-disable import/no-unused-modules */
 import updateNotifier from 'update-notifier';
 import { Command } from 'commander';
+
+import pkg from '../package';
 
 import lintMyAppFix from './lint-my-app-fix';
 import lintMyAppLint from './lint-my-app-lint';
 import lintMyAppStaged from './lint-my-app-staged';
-import pkg from '../package';
 
 updateNotifier({ pkg }).notify();
 
