@@ -6,10 +6,24 @@ import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 
 import availableConfigs from './available-configs';
 import fix from './lint-my-app-fix';
+import listrDefaults from './listr-defaults';
 
 jest.mock('execa');
 jest.mock('globby');
 jest.mock('imagemin-lint-staged/lib');
+jest.mock('listr');
+
+const mockListr = jest.fn();
+jest.mock('listr', () => {
+	const Listr = jest.requireActual('listr');
+
+	return class extends Listr {
+		constructor(...args) {
+			mockListr(...args);
+			super(...args);
+		}
+	};
+});
 
 const emptyJson = path.resolve(__dirname, 'empty.json');
 
@@ -49,6 +63,7 @@ describe('eslint --fix', () => {
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
 		expect(execa).toHaveBeenCalledTimes(1);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'eslint --fix' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -130,6 +145,9 @@ describe('stylelint --fix', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
 		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix' })]), { ...listrDefaults, concurrent: false });
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --report-needless-disables' })]), { ...listrDefaults, concurrent: false });
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -179,6 +197,9 @@ describe('stylelint --fix --syntax=scss', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
 		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss' })]), { ...listrDefaults, concurrent: false });
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss --report-needless-disables' })]), { ...listrDefaults, concurrent: false });
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -213,6 +234,8 @@ describe('sort-package-json', () => {
 
 		expect(execa).toHaveBeenCalledWith('sort-package-json', ['package.json']);
 		expect(execa).toHaveBeenCalledWith('sort-package-json', ['folder/package.json']);
+		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'sort-package-json' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
@@ -240,6 +263,8 @@ describe('fixjson', () => {
 
 		expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['--write', 'foo.json']));
 		expect(execa).toHaveBeenCalledWith('fixjson', expect.arrayContaining(['--write', 'folder/bar.json']));
+		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'fixjson' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
@@ -267,6 +292,8 @@ describe('imagemin-lint-staged', () => {
 
 		expect(imageminLint).toHaveBeenCalledWith('foo.png');
 		expect(imageminLint).toHaveBeenCalledWith('folder/bar.svg');
+		expect(imageminLint).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'imagemin' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {

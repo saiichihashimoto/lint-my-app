@@ -6,10 +6,24 @@ import pkgOk from 'pkg-ok';
 
 import availableConfigs from './available-configs';
 import lint from './lint-my-app-lint';
+import listrDefaults from './listr-defaults';
 
 jest.mock('execa');
 jest.mock('globby');
+jest.mock('listr');
 jest.mock('pkg-ok');
+
+const mockListr = jest.fn();
+jest.mock('listr', () => {
+	const Listr = jest.requireActual('listr');
+
+	return class extends Listr {
+		constructor(...args) {
+			mockListr(...args);
+			super(...args);
+		}
+	};
+});
 
 const emptyJson = path.resolve(__dirname, 'empty.json');
 
@@ -48,6 +62,7 @@ describe('eslint', () => {
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
 		expect(execa).toHaveBeenCalledTimes(1);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'eslint' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -128,6 +143,8 @@ describe('stylelint', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
 		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --report-needless-disables' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -176,6 +193,8 @@ describe('stylelint --syntax=scss', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
 		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --syntax=scss' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --syntax=scss --report-needless-disables' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -210,6 +229,8 @@ describe('pkg-ok', () => {
 
 		expect(pkgOk).toHaveBeenCalledWith(process.cwd());
 		expect(pkgOk).toHaveBeenCalledWith(`${process.cwd()}/folder`);
+		expect(pkgOk).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'pkg-ok' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
@@ -238,6 +259,8 @@ describe('jsonlint', () => {
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['--quiet']));
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['foo.json']));
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['folder/bar.json']));
+		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'jsonlint' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
