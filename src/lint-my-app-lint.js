@@ -1,8 +1,10 @@
+import path from 'path';
+
 import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
-import path from 'path';
 import packageOk from 'pkg-ok';
+
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
@@ -11,6 +13,7 @@ export default async function lint({
 	stylelint = true,
 	pkgOk = true,
 	jsonlint = true,
+	dot = true,
 } = {}) {
 	const [
 		jses,
@@ -19,11 +22,11 @@ export default async function lint({
 		packageJsons,
 		jsons,
 	] = await Promise.all([
-		eslint ? globby('**/*.js', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.css', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.scss', { gitignore: true, dot: true }) : [],
-		pkgOk ? globby('**/package.json', { gitignore: true, dot: true }) : [],
-		jsonlint ? globby('**/!(package|package-lock).json', { gitignore: true, dot: true }) : [],
+		eslint ? globby('**/*.js', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.css', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.scss', { dot, gitignore: true }) : [],
+		pkgOk ? globby('**/package.json', { dot, gitignore: true }) : [],
+		jsonlint ? globby('**/!(package|package-lock).json', { dot, gitignore: true }) : [],
 	]);
 
 	return new Listr([
@@ -32,7 +35,8 @@ export default async function lint({
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
 			task:    () => execa('eslint', [
-				...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '\'!.*\''] : [],
 				'--color',
 				'--report-unused-disable-directives',
 				...jses,
@@ -51,7 +55,7 @@ export default async function lint({
 			].map((styleArgs) => ({
 				title: ['stylelint', ...styleArgs].join(' '),
 				task:  () => execa('stylelint', [
-					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+					...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 					'--color',
 					'--allow-empty-input',
 					...styleArgs,
@@ -64,7 +68,9 @@ export default async function lint({
 			enabled: () => !pkgOk || packageJsons.length,
 			skip:    () => !pkgOk,
 			task:    () => Promise.all(
-				packageJsons.map((packageJson) => packageOk(path.resolve(path.dirname(packageJson)))),
+				packageJsons.map(
+					(packageJson) => packageOk(path.resolve(path.dirname(packageJson)))
+				)
 			),
 		},
 		{

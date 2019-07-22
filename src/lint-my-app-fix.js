@@ -1,8 +1,10 @@
+import path from 'path';
+
 import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
-import path from 'path';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
+
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
@@ -12,6 +14,7 @@ export default async function fix({
 	sortPackageJson = true,
 	fixjson = true,
 	imagemin = true,
+	dot = true,
 } = {}) {
 	const [
 		jses,
@@ -21,12 +24,12 @@ export default async function fix({
 		jsons,
 		images,
 	] = await Promise.all([
-		eslint ? globby('**/*.js', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.css', { gitignore: true, dot: true }) : [],
-		stylelint ? globby('**/*.scss', { gitignore: true, dot: true }) : [],
-		sortPackageJson ? globby('**/package.json', { gitignore: true, dot: true }) : [],
-		fixjson ? globby('**/!(package|package-lock).json', { gitignore: true, dot: true }) : [],
-		imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { gitignore: true, dot: true }) : [],
+		eslint ? globby('**/*.js', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.css', { dot, gitignore: true }) : [],
+		stylelint ? globby('**/*.scss', { dot, gitignore: true }) : [],
+		sortPackageJson ? globby('**/package.json', { dot, gitignore: true }) : [],
+		fixjson ? globby('**/!(package|package-lock).json', { dot, gitignore: true }) : [],
+		imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { dot, gitignore: true }) : [],
 	]);
 
 	return new Listr([
@@ -35,7 +38,8 @@ export default async function fix({
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
 			task:    () => execa('eslint', [
-				...(!availableConfigs.eslint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '\'!.*\''] : [],
 				'--color',
 				'--report-unused-disable-directives',
 				'--fix',
@@ -55,7 +59,7 @@ export default async function fix({
 			].map((styleArgs) => ({
 				title: ['stylelint', '--fix', ...styleArgs].join(' '),
 				task:  () => execa('stylelint', [
-					...(!availableConfigs.stylelint ? ['--config', path.resolve(__dirname, 'empty.json')] : []),
+					...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 					'--color',
 					'--allow-empty-input',
 					'--fix',

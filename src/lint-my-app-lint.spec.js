@@ -1,13 +1,29 @@
+import path from 'path';
+
 import execa from 'execa';
 import globby from 'globby';
-import path from 'path';
 import pkgOk from 'pkg-ok';
+
 import availableConfigs from './available-configs';
 import lint from './lint-my-app-lint';
+import listrDefaults from './listr-defaults';
 
 jest.mock('execa');
 jest.mock('globby');
+jest.mock('listr');
 jest.mock('pkg-ok');
+
+const mockListr = jest.fn();
+jest.mock('listr', () => {
+	const Listr = jest.requireActual('listr');
+
+	return class extends Listr {
+		constructor(...args) {
+			mockListr(...args);
+			super(...args);
+		}
+	};
+});
 
 const emptyJson = path.resolve(__dirname, 'empty.json');
 
@@ -17,6 +33,7 @@ beforeEach(() => {
 		const promise = Promise.resolve();
 		promise.stdin = jest.fn();
 		promise.stdout = { pipe: jest.fn() };
+
 		return promise;
 	});
 });
@@ -26,8 +43,14 @@ afterEach(() => {
 });
 
 describe('eslint', () => {
+	const configBefore = availableConfigs.eslint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.js' && gitignore && dot) ? ['foo.js', 'folder/bar.js'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['foo.js', 'folder/bar.js'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.eslint = configBefore;
 	});
 
 	it('executes', async () => {
@@ -35,20 +58,19 @@ describe('eslint', () => {
 
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
 		expect(execa).toHaveBeenCalledTimes(1);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'eslint' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
-		const valueBefore = availableConfigs.eslint;
 		availableConfigs.eslint = false;
 
 		await lint();
 
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--config', emptyJson]));
-
-		availableConfigs.eslint = valueBefore;
 	});
 
 	it('can be disabled', async () => {
@@ -64,15 +86,52 @@ describe('eslint', () => {
 
 		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
 	});
+
+	it('adds negated ignore-pattern for dotfiles', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['.foo.js'] : []));
+
+		await lint();
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledTimes(1);
+	});
+
+	it('adds negated ignore-pattern for dotfiles in a folder', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['folder/.foo.js'] : []));
+
+		await lint();
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledTimes(1);
+	});
+
+	it('ignores dotfiles', async () => {
+		globby.mockImplementation((pattern, { gitignore, dot }) => {
+			if (pattern !== '**/*.js' || !gitignore) {
+				return Promise.resolve([]);
+			}
+
+			return Promise.resolve(dot ? ['.foo.js', 'bar.js'] : ['bar.js']);
+		});
+
+		await lint({ dot: false });
+
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+	});
 });
 
 describe('stylelint', () => {
+	const configBefore = availableConfigs.stylelint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.css' && gitignore && dot) ? ['foo.css', 'folder/bar.css'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.css' && gitignore && dot ? ['foo.css', 'folder/bar.css'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.stylelint = configBefore;
 	});
 
 	it('executes', async () => {
-		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 
 		await lint();
@@ -84,8 +143,8 @@ describe('stylelint', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
 		expect(execa).toHaveBeenCalledTimes(2);
-
-		availableConfigs.stylelint = valueBefore;
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --report-needless-disables' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -111,12 +170,17 @@ describe('stylelint', () => {
 });
 
 describe('stylelint --syntax=scss', () => {
+	const configBefore = availableConfigs.stylelint;
+
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/*.scss' && gitignore && dot) ? ['foo.scss', 'folder/bar.scss'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.scss' && gitignore && dot ? ['foo.scss', 'folder/bar.scss'] : []));
+	});
+
+	afterEach(() => {
+		availableConfigs.stylelint = configBefore;
 	});
 
 	it('executes', async () => {
-		const valueBefore = availableConfigs.stylelint;
 		availableConfigs.stylelint = true;
 
 		await lint();
@@ -129,8 +193,8 @@ describe('stylelint --syntax=scss', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
 		expect(execa).toHaveBeenCalledTimes(2);
-
-		availableConfigs.stylelint = valueBefore;
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --syntax=scss' })]), listrDefaults);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --syntax=scss --report-needless-disables' })]), listrDefaults);
 	});
 
 	it('defaults to empty.json config', async () => {
@@ -157,7 +221,7 @@ describe('stylelint --syntax=scss', () => {
 
 describe('pkg-ok', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/package.json' && gitignore && dot) ? ['package.json', 'folder/package.json'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/package.json' && gitignore && dot ? ['package.json', 'folder/package.json'] : []));
 	});
 
 	it('executes', async () => {
@@ -165,6 +229,8 @@ describe('pkg-ok', () => {
 
 		expect(pkgOk).toHaveBeenCalledWith(process.cwd());
 		expect(pkgOk).toHaveBeenCalledWith(`${process.cwd()}/folder`);
+		expect(pkgOk).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'pkg-ok' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
@@ -184,7 +250,7 @@ describe('pkg-ok', () => {
 
 describe('jsonlint', () => {
 	beforeEach(() => {
-		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve((pattern === '**/!(package|package-lock).json' && gitignore && dot) ? ['foo.json', 'folder/bar.json'] : []));
+		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/!(package|package-lock).json' && gitignore && dot ? ['foo.json', 'folder/bar.json'] : []));
 	});
 
 	it('executes', async () => {
@@ -193,6 +259,8 @@ describe('jsonlint', () => {
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['--quiet']));
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['foo.json']));
 		expect(execa).toHaveBeenCalledWith('jsonlint', expect.arrayContaining(['folder/bar.json']));
+		expect(execa).toHaveBeenCalledTimes(2);
+		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'jsonlint' })]), listrDefaults);
 	});
 
 	it('can be disabled', async () => {
