@@ -8,6 +8,8 @@ import packageOk from 'pkg-ok';
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
 
+const parentDir = (file) => path.resolve(path.dirname(file));
+
 export default async function lint({
 	eslint = true,
 	stylelint = true,
@@ -67,11 +69,7 @@ export default async function lint({
 			title:   'pkg-ok',
 			enabled: () => !pkgOk || packageJsons.length,
 			skip:    () => !pkgOk,
-			task:    () => Promise.all(
-				packageJsons.map(
-					(packageJson) => packageOk(path.resolve(path.dirname(packageJson)))
-				)
-			),
+			task:    () => Promise.all(packageJsons.map((file) => packageOk(parentDir(file)))),
 		},
 		{
 			title:   'jsonlint',
