@@ -44,6 +44,8 @@ afterEach(() => {
 
 describe('eslint', () => {
 	const configBefore = availableConfigs.eslint;
+	const resolve = (modulePath) => modulePath === 'eslint' && '/a/path/to/eslint/lib/api.js';
+	const eslintPath = '/a/path/to/eslint/bin/eslint.js';
 
 	beforeEach(() => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['foo.js', 'folder/bar.js'] : []));
@@ -54,13 +56,13 @@ describe('eslint', () => {
 	});
 
 	it('executes', async () => {
-		await lint();
+		await lint({ resolve });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '!.*']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--color']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--report-unused-disable-directives']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.not.arrayContaining(['--ignore-pattern', '!.*']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['foo.js']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['folder/bar.js']));
 		expect(execa).toHaveBeenCalledTimes(1);
 		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'eslint' })]), listrDefaults);
 	});
@@ -68,40 +70,40 @@ describe('eslint', () => {
 	it('defaults to empty.json config', async () => {
 		availableConfigs.eslint = false;
 
-		await lint();
+		await lint({ resolve });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--config', emptyJson]));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--config', emptyJson]));
 	});
 
 	it('can be disabled', async () => {
-		await lint({ eslint: false });
+		await lint({ resolve, eslint: false });
 
-		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+		expect(execa).not.toHaveBeenCalledWith(eslintPath, expect.anything());
 	});
 
 	it('skips without jses', async () => {
 		globby.mockImplementation(() => Promise.resolve([]));
 
-		await lint();
+		await lint({ resolve });
 
-		expect(execa).not.toHaveBeenCalledWith('eslint', expect.anything());
+		expect(execa).not.toHaveBeenCalledWith(eslintPath, expect.anything());
 	});
 
 	it('adds negated ignore-pattern for dotfiles', async () => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['.foo.js'] : []));
 
-		await lint();
+		await lint({ resolve });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
 	it('adds negated ignore-pattern for dotfiles in a folder', async () => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['folder/.foo.js'] : []));
 
-		await lint();
+		await lint({ resolve });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
@@ -114,9 +116,9 @@ describe('eslint', () => {
 			return Promise.resolve(dot ? ['.foo.js', 'bar.js'] : ['bar.js']);
 		});
 
-		await lint({ dot: false });
+		await lint({ resolve, dot: false });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '!.*']));
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.not.arrayContaining(['--ignore-pattern', '!.*']));
 	});
 });
 

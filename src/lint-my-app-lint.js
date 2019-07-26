@@ -4,6 +4,7 @@ import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
 import packageOk from 'pkg-ok';
+import { bin as eslintBins } from 'eslint/package';
 
 import availableConfigs from './available-configs';
 import listrDefaults from './listr-defaults';
@@ -16,6 +17,7 @@ export default async function lint({
 	pkgOk = true,
 	jsonlint = true,
 	dot = true,
+	resolve = require.resolve,
 } = {}) {
 	const [
 		jses,
@@ -36,7 +38,7 @@ export default async function lint({
 			title:   'eslint',
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
-			task:    () => execa('eslint', [
+			task:    () => execa(path.resolve(resolve('eslint'), '../..', eslintBins.eslint), [
 				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '!.*'] : [],
 				'--color',
