@@ -93,7 +93,7 @@ describe('eslint --fix', () => {
 
 		await fix();
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
@@ -102,7 +102,7 @@ describe('eslint --fix', () => {
 
 		await fix();
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
@@ -117,7 +117,7 @@ describe('eslint --fix', () => {
 
 		await fix({ dot: false });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '!.*']));
 	});
 });
 

@@ -58,7 +58,7 @@ describe('eslint', () => {
 
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--report-unused-disable-directives']));
-		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['foo.js']));
 		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['folder/bar.js']));
 		expect(execa).toHaveBeenCalledTimes(1);
@@ -92,7 +92,7 @@ describe('eslint', () => {
 
 		await lint();
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
@@ -101,7 +101,7 @@ describe('eslint', () => {
 
 		await lint();
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.arrayContaining(['--ignore-pattern', '!.*']));
 		expect(execa).toHaveBeenCalledTimes(1);
 	});
 
@@ -116,7 +116,7 @@ describe('eslint', () => {
 
 		await lint({ dot: false });
 
-		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '\'!.*\'']));
+		expect(execa).toHaveBeenCalledWith('eslint', expect.not.arrayContaining(['--ignore-pattern', '!.*']));
 	});
 });
 

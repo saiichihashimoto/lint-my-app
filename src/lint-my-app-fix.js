@@ -39,7 +39,7 @@ export default async function fix({
 			skip:    () => !eslint,
 			task:    () => execa('eslint', [
 				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
-				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '\'!.*\''] : [],
+				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '!.*'] : [],
 				'--color',
 				'--report-unused-disable-directives',
 				'--fix',
