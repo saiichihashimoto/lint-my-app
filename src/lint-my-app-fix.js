@@ -3,6 +3,7 @@ import path from 'path';
 import Listr from 'listr';
 import execa from 'execa';
 import globby from 'globby';
+import { bin as eslintBins } from 'eslint/package';
 import { minifyFile as imageminLint } from 'imagemin-lint-staged/lib';
 
 import availableConfigs from './available-configs';
@@ -15,6 +16,7 @@ export default async function fix({
 	fixjson = true,
 	imagemin = true,
 	dot = true,
+	resolve = require.resolve,
 } = {}) {
 	const [
 		jses,
@@ -37,7 +39,7 @@ export default async function fix({
 			title:   'eslint --fix',
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
-			task:    () => execa('eslint', [
+			task:    () => execa(path.resolve(resolve('eslint'), '../..', eslintBins.eslint), [
 				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '!.*'] : [],
 				'--color',

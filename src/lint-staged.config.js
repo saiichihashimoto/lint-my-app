@@ -1,12 +1,16 @@
 /* istanbul ignore file */
 /* eslint-disable import/no-commonjs */
 /* eslint-disable import/no-unused-modules */
+import path from 'path';
+
+import { bin as eslintBins } from 'eslint/package';
+
 import availableConfigs from './available-configs';
 
 // Can't use "export default ..." with lint-staged
 module.exports = {
 	'*.js': [
-		`eslint --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${availableConfigs.eslint ? '' : `--config ${__dirname}/empty.json`}`,
+		`${path.resolve(require.resolve('eslint'), '../..', eslintBins.eslint)} --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${availableConfigs.eslint ? '' : `--config ${__dirname}/empty.json`}`,
 		'git add',
 	],
 	'*.css': [
