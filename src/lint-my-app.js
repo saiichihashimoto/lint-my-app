@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /* istanbul ignore file */
-/* eslint-disable import/no-unused-modules */
 import updateNotifier from 'update-notifier';
 import { Command } from 'commander';
 

@@ -1,6 +1,5 @@
 /* istanbul ignore file */
 /* eslint-disable import/no-commonjs */
-/* eslint-disable import/no-unused-modules */
 import path from 'path';
 
 import { bin as eslintBins } from 'eslint/package';
