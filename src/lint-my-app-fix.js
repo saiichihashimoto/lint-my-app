@@ -34,7 +34,7 @@ export default async function fix({
 		imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { dot, gitignore: true }) : [],
 	]);
 
-	const { eslint: { config: { extends: eslintExtends } = {} } = {} } = availableConfigs;
+	const { eslint: { config: { extends: eslintExtends } = {} } } = availableConfigs;
 
 	return new Listr([
 		{

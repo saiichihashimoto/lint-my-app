@@ -33,7 +33,7 @@ export default async function lint({
 		jsonlint ? globby('**/!(package|package-lock).json', { dot, gitignore: true }) : [],
 	]);
 
-	const { eslint: { config: { extends: eslintExtends } = {} } = {} } = availableConfigs;
+	const { eslint: { config: { extends: eslintExtends } = {} } } = availableConfigs;
 
 	return new Listr([
 		{
