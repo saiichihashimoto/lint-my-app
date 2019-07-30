@@ -34,13 +34,18 @@ export default async function fix({
 		imagemin ? globby('**/*.{png,jpeg,jpg,gif,svg}', { dot, gitignore: true }) : [],
 	]);
 
+	const { eslint: { config: { extends: eslintExtends } = {} } = {} } = availableConfigs;
+
 	return new Listr([
 		{
 			title:   'eslint --fix',
 			enabled: () => !eslint || jses.length,
 			skip:    () => !eslint,
-			task:    () => execa(path.resolve(resolve('eslint'), '../..', eslintBins.eslint), [
+			task:    () => execa(path.resolve(resolve('eslint').replace(/(.*node_modules\/eslint)\/.*$/u, '$1'), eslintBins.eslint), [
 				...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				...eslintExtends && typeof eslintExtends === 'string'
+					? ['--resolve-plugins-relative-to', resolve(`eslint-config-${eslintExtends}`).replace(new RegExp(`^(.*node_modules/eslint-config-${eslintExtends}).*$`, 'u'), '$1')]
+					: [],
 				...jses.some((js) => path.basename(js).startsWith('.')) ? ['--ignore-pattern', '!.*'] : [],
 				'--color',
 				'--report-unused-disable-directives',

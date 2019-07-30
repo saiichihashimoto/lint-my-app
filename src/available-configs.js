@@ -16,6 +16,10 @@ const cosmiconfigOptions = {
 	stylelint: {},
 };
 
-export default Object.entries(cosmiconfigOptions)
-	.filter(([moduleName, options]) => Boolean(cosmiconfig(moduleName, options).searchSync()))
-	.reduce((acc, [key]) => ({ ...acc, [key]: true }), {});
+export default Object.fromEntries(
+	Object.entries(cosmiconfigOptions)
+		.map(([moduleName, options]) => [
+			moduleName,
+			cosmiconfig(moduleName, options).searchSync(),
+		])
+);

@@ -44,8 +44,8 @@ afterEach(() => {
 
 describe('eslint', () => {
 	const configBefore = availableConfigs.eslint;
-	const resolve = (modulePath) => modulePath === 'eslint' && '/a/path/to/eslint/lib/api.js';
-	const eslintPath = '/a/path/to/eslint/bin/eslint.js';
+	const eslintPath = '/a/path/to/node_modules/eslint/bin/eslint.js';
+	let resolve = (modulePath) => (modulePath === 'eslint' ? '/a/path/to/node_modules/eslint/lib/api.js' : '');
 
 	beforeEach(() => {
 		globby.mockImplementation((pattern, { gitignore, dot }) => Promise.resolve(pattern === '**/*.js' && gitignore && dot ? ['foo.js', 'folder/bar.js'] : []));
@@ -73,6 +73,30 @@ describe('eslint', () => {
 		await lint({ resolve });
 
 		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--config', emptyJson]));
+	});
+
+	it('resolves plugins relative to a singular extends', async () => {
+		const previousResolve = resolve;
+		resolve = (modulePath) => previousResolve(modulePath) || (modulePath === 'eslint-config-foobar' ? '/a/path/to/node_modules/eslint-config-foobar/path/to/config.js' : '');
+		availableConfigs.eslint = {
+			config: { extends: 'foobar' },
+		};
+
+		await lint({ resolve });
+
+		expect(execa).toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--resolve-plugins-relative-to', '/a/path/to/node_modules/eslint-config-foobar']));
+	});
+
+	it('doesn\'t resolve plugins relative to a plural extends', async () => {
+		const previousResolve = resolve;
+		resolve = (modulePath) => previousResolve(modulePath) || (modulePath === 'eslint-config-foobar' ? '/a/path/to/node_modules/eslint-config-foobar/path/to/config.js' : '');
+		availableConfigs.eslint = {
+			config: { extends: ['foobar'] },
+		};
+
+		await lint({ resolve });
+
+		expect(execa).not.toHaveBeenCalledWith(eslintPath, expect.arrayContaining(['--resolve-plugins-relative-to']));
 	});
 
 	it('can be disabled', async () => {
