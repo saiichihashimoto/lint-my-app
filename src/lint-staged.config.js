@@ -6,10 +6,28 @@ import { bin as eslintBins } from 'eslint/package';
 
 import availableConfigs from './available-configs';
 
+const { eslint: { config: { extends: eslintExtends } = {} } } = availableConfigs;
+
+/*
+ * TODO Reuse all of these commonalities with fix
+ * BODY Probably test them too
+ */
+
 // Can't use "export default ..." with lint-staged
 module.exports = {
 	'*.js': [
-		`${path.resolve(require.resolve('eslint'), '../..', eslintBins.eslint)} --fix --color --ignore-pattern '!.*.js' --report-unused-disable-directives ${availableConfigs.eslint ? '' : `--config ${__dirname}/empty.json`}`,
+		[
+			path.resolve(require.resolve('eslint'), '../..', eslintBins.eslint),
+			...availableConfigs.eslint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+			...eslintExtends && typeof eslintExtends === 'string'
+				? ['--resolve-plugins-relative-to', require.resolve(`eslint-config-${eslintExtends}`).replace(new RegExp(`^(.*node_modules/eslint-config-${eslintExtends}).*$`, 'u'), '$1')]
+				: [],
+			'--ignore-pattern',
+			'\'!.*\'',
+			'--color',
+			'--report-unused-disable-directives',
+			'--fix',
+		].filter(Boolean).join(' '),
 		'git add',
 	],
 	'*.css': [
