@@ -163,23 +163,19 @@ describe('stylelint --fix', () => {
 
 		await fix();
 
-		// FIXME How do I check for all four combinations?
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--fix']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
-		expect(execa).toHaveBeenCalledTimes(2);
+		expect(execa).toHaveBeenCalledTimes(1);
 		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix' })]), listrDefaults);
-		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix' })]), { ...listrDefaults, concurrent: false });
-		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --report-needless-disables' })]), { ...listrDefaults, concurrent: false });
 	});
 
 	it('defaults to empty.json config', async () => {
 		await fix();
 
-		// FIXME How do I check for all four combinations?
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson]));
 	});
 
@@ -214,7 +210,6 @@ describe('stylelint --fix --syntax=scss', () => {
 
 		await fix();
 
-		// FIXME How do I check for all four combinations?
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
@@ -222,16 +217,13 @@ describe('stylelint --fix --syntax=scss', () => {
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--syntax=scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));
-		expect(execa).toHaveBeenCalledTimes(2);
+		expect(execa).toHaveBeenCalledTimes(1);
 		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss' })]), listrDefaults);
-		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss' })]), { ...listrDefaults, concurrent: false });
-		expect(mockListr).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ title: 'stylelint --fix --syntax=scss --report-needless-disables' })]), { ...listrDefaults, concurrent: false });
 	});
 
 	it('defaults to empty.json config', async () => {
 		await fix();
 
-		// FIXME How do I check for all four combinations?
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--config', emptyJson, '--syntax=scss']));
 	});
 

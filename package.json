@@ -72,7 +72,7 @@
     "listr": "0.14.3",
     "pkg-ok": "2.3.1",
     "sort-package-json": "1.22.1",
-    "stylelint": "stylelint/stylelint#0bbe61f2730f8401d7626fabe70da623cfcefba5",
+    "stylelint": "stylelint/stylelint#d3a6cb47fc2d5c59e61f6fac618c6121b316b97c",
     "update-notifier": "3.0.1"
   },
   "devDependencies": {
