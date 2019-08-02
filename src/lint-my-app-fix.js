@@ -51,7 +51,7 @@ export default async function fix({
 				'--report-unused-disable-directives',
 				'--fix',
 				...jses,
-			].filter(Boolean)),
+			]),
 		},
 		...[
 			{ files: csses, args: [] },
@@ -60,23 +60,15 @@ export default async function fix({
 			title:   ['stylelint', '--fix', ...args].join(' '),
 			enabled: () => !stylelint || files.length,
 			skip:    () => !stylelint,
-			task:    () => new Listr([
-				args,
-				[...args, '--report-needless-disables'],
-			].map((styleArgs) => ({
-				title: ['stylelint', '--fix', ...styleArgs].join(' '),
-				task:  () => execa('stylelint', [
-					...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
-					'--color',
-					'--allow-empty-input',
-					'--fix',
-					...styleArgs,
-					...files,
-				].filter(Boolean)),
-			})), {
-				...listrDefaults,
-				concurrent: false,
-			}),
+			task:    () => execa('stylelint', [
+				...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				'--color',
+				'--allow-empty-input',
+				'--report-needless-disables',
+				'--fix',
+				...args,
+				...files,
+			]),
 		})),
 		{
 			title:   'sort-package-json',

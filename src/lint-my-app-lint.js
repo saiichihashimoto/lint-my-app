@@ -49,7 +49,7 @@ export default async function lint({
 				'--color',
 				'--report-unused-disable-directives',
 				...jses,
-			].filter(Boolean)),
+			]),
 		},
 		...[
 			{ files: csses, args: [] },
@@ -58,19 +58,14 @@ export default async function lint({
 			title:   ['stylelint', ...args].join(' '),
 			enabled: () => !stylelint || files.length,
 			skip:    () => !stylelint,
-			task:    () => new Listr([
-				args,
-				[...args, '--report-needless-disables'],
-			].map((styleArgs) => ({
-				title: ['stylelint', ...styleArgs].join(' '),
-				task:  () => execa('stylelint', [
-					...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
-					'--color',
-					'--allow-empty-input',
-					...styleArgs,
-					...files,
-				].filter(Boolean)),
-			})), listrDefaults),
+			task:    () => execa('stylelint', [
+				...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
+				'--color',
+				'--allow-empty-input',
+				'--report-needless-disables',
+				...args,
+				...files,
+			]),
 		})),
 		{
 			title:   'pkg-ok',
