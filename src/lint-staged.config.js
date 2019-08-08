@@ -31,12 +31,10 @@ module.exports = {
 		'git add',
 	],
 	'*.css': [
-		`stylelint --fix --color --allow-empty-input ${availableConfigs.stylelint ? '' : `--config ${__dirname}/empty.json`}`,
 		`stylelint --fix --color --allow-empty-input ${availableConfigs.stylelint ? '' : `--config ${__dirname}/empty.json`} --report-needless-disables`,
 		'git add',
 	],
 	'*.scss': [
-		`stylelint --syntax=scss --fix --color --allow-empty-input ${availableConfigs.stylelint ? '' : `--config ${__dirname}/empty.json`}`,
 		`stylelint --syntax=scss --fix --color --allow-empty-input ${availableConfigs.stylelint ? '' : `--config ${__dirname}/empty.json`} --report-needless-disables`,
 		'git add',
 	],
