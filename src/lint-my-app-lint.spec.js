@@ -164,7 +164,7 @@ describe('stylelint', () => {
 
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--report-needless-disables']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.css']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.css']));
 		expect(execa).toHaveBeenCalledTimes(1);
@@ -210,7 +210,7 @@ describe('stylelint --syntax=scss', () => {
 
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--color']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--allow-empty-input']));
-		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--report-needless-disables']));
+		expect(execa).toHaveBeenCalledWith('stylelint', expect.not.arrayContaining(['--report-needless-disables']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['--syntax=scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['foo.scss']));
 		expect(execa).toHaveBeenCalledWith('stylelint', expect.arrayContaining(['folder/bar.scss']));

@@ -62,7 +62,6 @@ export default async function lint({
 				...availableConfigs.stylelint ? [] : ['--config', path.resolve(__dirname, 'empty.json')],
 				'--color',
 				'--allow-empty-input',
-				'--report-needless-disables',
 				...args,
 				...files,
 			]),
