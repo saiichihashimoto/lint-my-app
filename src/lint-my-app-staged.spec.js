@@ -15,7 +15,7 @@ afterEach(() => {
 });
 
 it('executes lint-staged', async () => {
-	await expect(staged()).resolves;
+	await staged();
 
 	expect(lintStaged).toHaveBeenCalledWith(expect.objectContaining({ configPath: path.resolve(__dirname, 'lint-staged.config.js') }));
 });
