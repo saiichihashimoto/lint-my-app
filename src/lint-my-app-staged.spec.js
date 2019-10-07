@@ -20,7 +20,7 @@ it('executes lint-staged', async () => {
 	expect(lintStaged).toHaveBeenCalledWith(expect.objectContaining({ configPath: path.resolve(__dirname, 'lint-staged.config.js') }));
 });
 
-it('resolves', () => expect(staged()).resolves.toBe(true));
+it('resolves', async () => expect(await staged()).toBe(true));
 
 it('rejects if staged fails', async () => {
 	lintStaged.mockImplementation(() => Promise.resolve(false));
