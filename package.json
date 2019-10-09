@@ -63,7 +63,7 @@
     "commander": "3.0.2",
     "cosmiconfig": "5.2.1",
     "eslint": "6.5.1",
-    "execa": "2.0.5",
+    "execa": "2.1.0",
     "fixjson": "1.1.0",
     "globby": "10.0.1",
     "imagemin-lint-staged": "0.4.0",
