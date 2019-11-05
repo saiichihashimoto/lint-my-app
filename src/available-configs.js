@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import cosmiconfig from 'cosmiconfig';
+import { cosmiconfigSync } from 'cosmiconfig';
 
 const cosmiconfigOptions = {
 	eslint: {
@@ -20,6 +20,6 @@ export default Object.fromEntries(
 	Object.entries(cosmiconfigOptions)
 		.map(([moduleName, options]) => [
 			moduleName,
-			cosmiconfig(moduleName, options).searchSync(),
+			cosmiconfigSync(moduleName, options).search(),
 		])
 );
