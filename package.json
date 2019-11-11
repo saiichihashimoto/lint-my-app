@@ -60,7 +60,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "commander": "4.0.0",
+    "commander": "4.0.1",
     "cosmiconfig": "6.0.0",
     "eslint": "6.6.0",
     "execa": "3.2.0",
