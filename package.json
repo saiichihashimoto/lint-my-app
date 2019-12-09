@@ -62,7 +62,7 @@
   "dependencies": {
     "commander": "4.0.1",
     "cosmiconfig": "6.0.0",
-    "eslint": "6.6.0",
+    "eslint": "6.7.2",
     "execa": "3.4.0",
     "fixjson": "1.1.0",
     "globby": "10.0.1",
