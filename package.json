@@ -71,7 +71,7 @@
     "lint-staged": "9.5.0",
     "listr": "0.14.3",
     "pkg-ok": "2.3.1",
-    "sort-package-json": "1.32.0",
+    "sort-package-json": "1.32.2",
     "stylelint": "stylelint/stylelint#d3a6cb47fc2d5c59e61f6fac618c6121b316b97c",
     "update-notifier": "4.0.0"
   },
