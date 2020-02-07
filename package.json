@@ -28,12 +28,12 @@
     "url": "git+https://github.com/saiichihashimoto/lint-my-app.git"
   },
   "license": "MIT",
+  "main": "lib/lint-staged.config.js",
+  "bin": "lib/lint-my-app.js",
   "files": [
     "husky.js",
     "lib"
   ],
-  "main": "lib/lint-staged.config.js",
-  "bin": "lib/lint-my-app.js",
   "scripts": {
     "build": "babel src --out-dir lib --source-maps --delete-dir-on-start --verbose --ignore \"**/*.spec.js\" && cp src/*.json lib",
     "fix": "npm run lint-my-app -- fix",
@@ -60,7 +60,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "commander": "4.0.1",
+    "commander": "4.1.1",
     "cosmiconfig": "6.0.0",
     "eslint": "6.8.0",
     "execa": "4.0.0",
@@ -71,20 +71,20 @@
     "lint-staged": "9.5.0",
     "listr": "0.14.3",
     "pkg-ok": "2.3.1",
-    "sort-package-json": "1.39.0",
+    "sort-package-json": "1.39.1",
     "stylelint": "stylelint/stylelint#d3a6cb47fc2d5c59e61f6fac618c6121b316b97c",
     "update-notifier": "4.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.8.3",
-    "@babel/core": "7.8.0",
-    "@babel/preset-env": "7.8.2",
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.8.4",
+    "@babel/preset-env": "7.8.4",
     "@stryker-mutator/babel-transpiler": "2.4.0",
     "@stryker-mutator/core": "2.4.0",
     "@stryker-mutator/javascript-mutator": "2.4.0",
     "@stryker-mutator/jest-runner": "2.4.0",
-    "cz-conventional-changelog": "3.0.2",
-    "eslint-config-saiichihashimoto": "2.1.0",
+    "cz-conventional-changelog": "3.1.0",
+    "eslint-config-saiichihashimoto": "2.1.2",
     "husky": "4.2.1",
     "jest": "24.1.0"
   },
