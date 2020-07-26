@@ -40,7 +40,9 @@
     "lint": "npm run lint-my-app -- lint",
     "lint-my-app": "npm run build && ./lib/lint-my-app.js",
     "staged": "npm run lint-my-app -- staged",
-    "test": "jest --verbose $(if [ -z ${CI+x} ]; then echo --watch; else echo --color --coverage; fi)"
+    "test": "jest --verbose $(if [ -z ${CI+x} ]; then echo --watch; else echo --color --coverage; fi)",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "husky": {
     "hooks": {
@@ -63,9 +65,9 @@
     "commander": "4.1.1",
     "cosmiconfig": "6.0.0",
     "eslint": "6.8.0",
-    "execa": "4.0.0",
+    "execa": "4.0.1",
     "fixjson": "1.1.0",
-    "globby": "10.0.1",
+    "globby": "10.0.2",
     "imagemin-lint-staged": "0.4.0",
     "jsonlint": "1.6.3",
     "lint-staged": "9.5.0",
@@ -73,7 +75,8 @@
     "pkg-ok": "2.3.1",
     "sort-package-json": "1.41.0",
     "stylelint": "stylelint/stylelint#d3a6cb47fc2d5c59e61f6fac618c6121b316b97c",
-    "update-notifier": "4.1.0"
+    "update-notifier": "4.1.0",
+    "snyk": "^1.366.2"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
@@ -90,5 +93,6 @@
   },
   "engines": {
     "node": "12.8.0"
-  }
+  },
+  "snyk": true
 }
