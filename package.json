@@ -76,7 +76,7 @@
     "sort-package-json": "1.44.0",
     "stylelint": "stylelint/stylelint#d3a6cb47fc2d5c59e61f6fac618c6121b316b97c",
     "update-notifier": "4.1.0",
-    "snyk": "^1.369.1"
+    "snyk": "^1.369.2"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
